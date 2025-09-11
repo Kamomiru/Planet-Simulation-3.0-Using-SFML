@@ -26,7 +26,9 @@ int main()
                 modeHandler.setMode(std::make_unique<DisplayTestMode>());
 			}
 
-			modeHandler.handleEvent(&event);
+			modeHandler.handleEvent(*event); //we can use the derefence operator * here to get the actual event. 
+            //we could also use following syntax here:
+            //modeHandler.handleEvent(event.value())
         }
 
 		modeHandler.render(window);
