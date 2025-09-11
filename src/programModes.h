@@ -7,10 +7,10 @@
 class StartupMode : public BaseMode {
 private:
 	sf::RectangleShape rectangle;
-
 public:
 
 	StartupMode() { 
+		modeID = ProgramModeID::Startup;
 		rectangle.setSize(sf::Vector2f(200.f, 100.f));
 		rectangle.setFillColor(sf::Color::Black);
 		rectangle.setPosition({ 800.0f, 600.0f }); // Center of a 1920x1080 view
@@ -32,6 +32,7 @@ private:
 	sf::CircleShape circle;
 public:
 	DisplayTestMode() {
+		modeID = ProgramModeID::DisplayTest;
 		circle.setRadius(50.f);
 		circle.setFillColor(sf::Color::Black);
 		circle.setPosition({ 600.0f, 400.0f });

@@ -26,4 +26,9 @@ public:
 	void render(sf::RenderWindow& window) {
 		currentMode->render(window);
 	}
+
+	//Getter for currentMode's ID
+	ProgramModeID getCurrentModeID() const {
+		return currentMode->getModeID();
+	}
 };

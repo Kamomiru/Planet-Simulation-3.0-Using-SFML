@@ -30,5 +30,8 @@ int main()
         }
 
 		modeHandler.render(window);
+
+		std::cout << "Current Mode ID: " << static_cast<int>(modeHandler.getCurrentModeID()) << std::endl;
+
     }
 }
