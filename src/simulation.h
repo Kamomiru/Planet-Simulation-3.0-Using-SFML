@@ -4,30 +4,36 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "constants.h"
-#include "vectorHelper.h"
+#include "../helpers/vectorHelper.h"
 #include <cmath>
 
 #include <iostream>
 
 class CelestialObject { //TODO: Implement Verlet integration
 private:
-    std::string name;
+	std::string name = "default";
     sf::CircleShape shape;
-    sf::Color color;
+	sf::Color color = sf::Color::White;
 
 	//Simulation Relevant Attributes
-    double mass;
-    double radius;
+    double mass = -1;
+    double radius = -1;
     std::vector<double> position;
 	std::vector<double> velocity; //TODO: is this needed for velet integration? Maybe store previous position instead of velocity?
 
-    double startingKineticEnergy;
+    double startingKineticEnergy = -1;
     
     sf::VertexArray trajectory;
 
-    
+	bool objectSetupComplete = false;
 
 public:
+	//Default Constructor
+    CelestialObject() {
+        trajectory.setPrimitiveType(sf::PrimitiveType::LineStrip);
+        trajectory.append(vectorToVertex(position));
+    }
+
     //Constructor
     CelestialObject(std::string n, double m, double r, std::vector<double> pos, std::vector<double> vel, sf::Color col) {
         name = n;
@@ -46,13 +52,68 @@ public:
         trajectory.setPrimitiveType(sf::PrimitiveType::LineStrip);
         trajectory.append(vectorToVertex(position));
 
-        //startingKineticEnergy = this->calcKineticEnergy();
+        startingKineticEnergy = this->calcStartingKineticEnergy();
+
+		objectSetupComplete = true;
     }
 
-    //show object in RenderWindow
-    void draw(bool drawTrajectory = false) {
-		//TODO: Will this function be needed in current implementation?
+    struct Builder {
+		static void setName(CelestialObject& obj, const std::string& n) { 
+            assert(obj.name == "default" && "Error: Name is already defined!");
+            obj.name = n; }
+
+        static void setColor(CelestialObject& obj, sf::Color c) { 
+            assert(obj.color == sf::Color::White && "Error: Color is already defined!");
+            obj.color = c; 
+            obj.shape.setFillColor(c);
+		}
+        
+        static void setMass(CelestialObject& obj, double m) {
+            assert(obj.mass == -1 && "Error: Mass has alrady been set!");
+			obj.mass = m;
+		}
+        
+        static void setRadius(CelestialObject& obj, double r) {
+            assert(obj.radius == -1 && "Error: Radius has alrady been set!");
+            obj.radius = r;
+            obj.shape.setRadius(obj.radius);
+			obj.shape.setOrigin({ static_cast<float>(r),static_cast<float>(r) });
+        }
+
+        static void setPosition(CelestialObject& obj, std::vector<double> pos) {
+            assert(obj.position.empty() && "Error: Position has alrady been set!");
+			obj.position = pos;
+            obj.shape.setPosition(vectorToSfVector(obj.position));
+        }
+
+        static void setVelocity(CelestialObject& obj, std::vector<double> vel) {
+			assert(obj.velocity.empty() && "Error: Velocity has alrady been set!");
+            obj.velocity = vel;
+        }
+        
+        static void finalizeSetup(CelestialObject& obj) {
+			assert(!obj.objectSetupComplete && "Error: Object setup is already complete!");
+            assert(obj.name != "default" && "Error: Name was not set!");
+            assert(obj.mass != -1 && "Error: Mass was not set!");
+            assert(obj.radius != -1 && "Error: Radius was not set!");
+            assert(!obj.position.empty() && "Error: Position was not set!");
+            assert(!obj.velocity.empty() && "Error: Velocity was not set!");
+            //Setup trajectory VertexArray
+            obj.trajectory.append(vectorToVertex(obj.position));
+			obj.startingKineticEnergy = obj.calcStartingKineticEnergy();
+			
+            obj.objectSetupComplete = true;
+        }
+
+    };
+
+    double calcStartingKineticEnergy() {
+		assert(startingKineticEnergy == -1 && "Error: StartingKineticEnergy has already been calculated!"); //Make sure this function is only called once!
+		startingKineticEnergy = 0.5l * mass * (velocity[0] * velocity[0] + velocity[1] * velocity[1]);
+		return startingKineticEnergy;
     }
+
+
 
 #pragma region Get Functions
     //Get CelestialObject name
@@ -80,7 +141,7 @@ public:
     }
 
     sf::Drawable& getDrawable() {
-        return shape;
+		return shape; //TODO: Implement to return both shape and trajectory
 	}
 #pragma endregion
 
@@ -93,15 +154,15 @@ public:
 class Simulation {
 public:
     int steps;
-    double startingSystemEnergy;
-    std::vector<CelestialObject> CelestialObjectContainer;
-    std::vector<pairContainer<CelestialObject>> CelestialObjectPairContainer;
+    double startingSystemEnergy = !1;
+    std::vector<CelestialObject> celestialObjectContainer;
+    std::vector<pairContainer<CelestialObject>> celestialObjectPairContainer;
 
     //Constructor
     Simulation(std::vector<CelestialObject> CelestialObjectContainer) {
-        CelestialObjectContainer = CelestialObjectContainer;
-        CelestialObjectPairContainer = getPairs(CelestialObjectContainer);
-        startingSystemEnergy = calcTotalKineticEnergy() - calcTotalPotentialEnergy();
+        celestialObjectContainer = CelestialObjectContainer;
+        celestialObjectPairContainer = getPairs(CelestialObjectContainer);
+        //TODO: Implement Energy calculation for Simulation analysis. startingSystemEnergy = calcTotalKineticEnergy() - calcTotalPotentialEnergy();
         steps = 0;
     }
 
