@@ -51,11 +51,12 @@ sf::Vertex vectorToVertex(std::vector<double> vector) {
 }
 
 sf::Vector2f vectorToSfVector(std::vector<double> vector) {
+	assert(vector.size() == 2 && "Error: Vector size is not 2!");
 	return sf::Vector2f{ static_cast<float>(vector[0]),static_cast<float>(vector[1]) };
 }
 
 //overload + operator to support elementwise addition via + symbol (very cool)
-std::vector<double>& operator+(const std::vector<double>& a, const std::vector<double>& b) { //vectors a and b are being passed by reference due to the & sign
+std::vector<double> operator+(const std::vector<double>& a, const std::vector<double>& b) { //vectors a and b are being passed by reference due to the & sign
 	if (a.size() != b.size()) { //Check if vectors a and b have the same dimension
 		throw std::invalid_argument("Vectors must have the same size");
 	}
@@ -67,7 +68,7 @@ std::vector<double>& operator+(const std::vector<double>& a, const std::vector<d
 }
 
 //overload - operator to support elementwise addition via - symbol (very cool)
-std::vector<double>& operator-(const std::vector<double>& a, const std::vector<double>& b) { //vectors a and b are being passed by reference due to the & sign
+std::vector<double> operator-(const std::vector<double>& a, const std::vector<double>& b) { //vectors a and b are being passed by reference due to the & sign
 	if (a.size() != b.size()) { //Check if vectors a and b have the same dimension
 		throw std::invalid_argument("Vectors must have the same size");
 	}
@@ -80,7 +81,7 @@ std::vector<double>& operator-(const std::vector<double>& a, const std::vector<d
 
 //overload * operator to do scalar multiplication between scalar and vector.
 //ONLY FOR FOLLOWING ORDER: [scalar * vector]
-std::vector<double>& operator*(const double s, const std::vector<double>& v) {
+std::vector<double> operator*(const double s, const std::vector<double>& v) {
 	std::vector<double> result(v.size());
 	for (int i{ 0 }; i < v.size(); i++) {
 		result[i] = s * v[i];
@@ -90,7 +91,7 @@ std::vector<double>& operator*(const double s, const std::vector<double>& v) {
 
 //overload * operator to do scalar multiplication between scalar and vector.
 //ONLY FOR FOLLOWING ORDER: [vector * scalar]
-std::vector<double>& operator*(const std::vector<double>& v, const double s) {
+std::vector<double> operator*(const std::vector<double>& v, const double s) {
 	std::vector<double> result(v.size());
 	for (int i{ 0 }; i < v.size(); i++) {
 		result[i] = s * v[i];

@@ -22,6 +22,11 @@ public:
 		currentMode->handleEvent(event);
 	}
 
+	//Update according to currentMode
+	void update() {
+		currentMode->update();
+	}
+
 	//Render according to currentMode
 	void render(sf::RenderWindow& window) {
 		currentMode->render(window);

@@ -22,13 +22,12 @@ double vectorAngle(std::vector<double> vector);
 sf::Vertex vectorToVertex(std::vector<double> vector);
 sf::Vector2f vectorToSfVector(std::vector<double> vector);
 
-std::vector<double>& operator+(std::vector<double>& a, const std::vector<double>& b);
-std::vector<double>& operator*(const std::vector<double>& v, const double s);
-std::vector<double>& operator*(const double s, const std::vector<double>& v);
+std::vector<double> operator+(std::vector<double>& a, const std::vector<double>& b);
+std::vector<double> operator*(const std::vector<double>& v, const double s);
+std::vector<double> operator*(const double s, const std::vector<double>& v);
+std::vector<double> operator-(const std::vector<double>& a, const std::vector<double>& b);
+
 std::vector<double>& operator+=(std::vector<double>& a, const std::vector<double>& b);
-std::vector<double>& operator-(const std::vector<double>& a, const std::vector<double>& b);
-
-
 
 //creates all possible pair combination of objects in a vector
 template <typename T> //Sets function up so that the output is a vector that holds Object pairs of a certain type and gets a vector with Objects of that type.

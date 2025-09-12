@@ -120,7 +120,16 @@ public:
 		return startingKineticEnergy;
     }
 
+    void logCurrentPosition() {
+        previousPositions.push_back(position);
+        trajectory.append(vectorToVertex(position));
+    }
 
+    void updatePosition(std::vector<double> newPos) {
+        //assert(!newPos.empty() && "Error: vector is empty");
+        position = newPos;
+        shape.setPosition(vectorToSfVector(newPos));
+	}
 
 #pragma region Get Functions
     //Get CelestialObject name
@@ -147,8 +156,12 @@ public:
         return startingKineticEnergy;
     }
 
-    sf::Drawable& getDrawable() {
-		return shape; //TODO: Implement to return both shape and trajectory
+    sf::CircleShape getObjectDrawable() {
+        return shape;
+	}
+
+    sf::VertexArray getTrajectoryDrawable() {
+        return trajectory;
 	}
 
     std::vector<std::vector<double>> getPreviousPositions() {
@@ -211,15 +224,28 @@ public:
 
         static void finalizeSetup(Simulation& sim) {
             //TODO: Implement Energy calculation for Simulation analysis
-			//TODO: Eventually implement asserts
+            assert(!sim.celestialObjectContainer.empty() && "Error: celestialObjectContainer has to have at least one Celestial Object!");
+			sim.simulationSetupComplete = true;
         }
     };
 
 
+    std::vector<sf::CircleShape> getObjectDrawables() {
+        std::vector<sf::CircleShape> drawables;
+        for (int i{ 0 }; i < celestialObjectContainer.size(); i++) {
+            drawables.push_back(celestialObjectContainer[i].getObjectDrawable());
+        }
+		return drawables;
+    }
 
-    void incrementVerlet() {
-        steps++;
-	}
+    std::vector<sf::VertexArray> getTrajectoryDrawables() {
+        std::vector<sf::VertexArray> drawables;
+        for (int i{ 0 }; i < celestialObjectContainer.size(); i++) {
+            drawables.push_back(celestialObjectContainer[i].getTrajectoryDrawable());
+        }
+        return drawables;
+    }
+    
 
 #pragma region Calculation Functions
 
@@ -240,6 +266,7 @@ public:
             }
         }
 
+		std::cout << "Total Accel Vector for " << obj.getName() << ": (" << totalAccelVector[0] << " , " << totalAccelVector[1] << ")\n";
 		return totalAccelVector;
     }
 
@@ -251,7 +278,10 @@ public:
         std::vector<double> currentPos = obj.getPosition();
 		std::vector<double> previousPos = obj.getPreviousPositions()[steps - 1];
 		std::vector<double> acc = this->calcTotalAccel(obj);
-        nextPos = 2 * currentPos - previousPos +  acc * constants::dt * constants::dt;
+        //nextPos = 2 * currentPos - previousPos +  acc * dt * dt;
+        for (int i{ 0 }; i <= 1; i++) {
+			nextPos[i] = 2 * currentPos[i] - previousPos[i] + acc[i] * dt * dt;
+        }
 
         return nextPos;
     }
@@ -263,11 +293,36 @@ public:
 		std::vector<double> nextPos{ 0.0,0.0 };
 		std::vector<double> currentPos = obj.getPosition();
         std::vector<double> acc = this->calcTotalAccel(obj);
-        nextPos = currentPos + obj.getVelocity() * constants::dt + 0.5l * acc * constants::dt * constants::dt;
-
+        //nextPos = currentPos + obj.getVelocity() * dt + 0.5l * acc * dt * dt;
+        for (int i{ 0 }; i <= 1; i++) {
+			nextPos[i] = currentPos[i] + obj.getVelocity()[i] * dt + 0.5l * acc[i] * dt * dt;
+        }
 		return nextPos;
     }
 
+    void updateSimulationVerlet() {
+        assert(simulationSetupComplete && "Error: Simulation Setup is not complete yet!");
+
+		std::vector<std::vector<double>> nextPositions(celestialObjectContainer.size(), std::vector<double>(2, 0.0)); //2D vector to hold next positions of all CelestialObjects
+
+        for (int i{ 0 }; i < celestialObjectContainer.size(); i++) {
+            std::vector<double> nextPos;
+			CelestialObject& obj = celestialObjectContainer[i];
+            if (steps == 0) {
+                nextPos = incrementFirstPositionVerlet(obj);
+            } else {
+                nextPos = incrementPositionVerlet(obj);
+			}
+			obj.logCurrentPosition(); //Log current position before updating it
+			nextPositions[i] = nextPos;
+        }
+		std::cout << celestialObjectContainer.size() << std::endl;
+        for (int i_{ 0 }; i_ < celestialObjectContainer.size(); i_++) { //
+            CelestialObject& obj = celestialObjectContainer[i_];
+            obj.updatePosition(nextPositions[i_]);
+        }
+        steps++;
+    }
 #pragma endregion
 
 #pragma region EnergyFunctions
