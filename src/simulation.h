@@ -143,6 +143,11 @@ public:
     sf::Drawable& getDrawable() {
 		return shape; //TODO: Implement to return both shape and trajectory
 	}
+
+	bool isSetupComplete() {
+        return objectSetupComplete;
+	}
+
 #pragma endregion
 
     //Overload == Operator
@@ -154,9 +159,16 @@ public:
 class Simulation {
 public:
     int steps;
-    double startingSystemEnergy = !1;
+    double startingSystemEnergy = -1;
     std::vector<CelestialObject> celestialObjectContainer;
     std::vector<pairContainer<CelestialObject>> celestialObjectPairContainer;
+
+	bool simulationSetupComplete = false;
+
+	//Default Constructor
+    Simulation() {
+        steps = 0;
+	}
 
     //Constructor
     Simulation(std::vector<CelestialObject> CelestialObjectContainer) {
@@ -164,7 +176,32 @@ public:
         celestialObjectPairContainer = getPairs(CelestialObjectContainer);
         //TODO: Implement Energy calculation for Simulation analysis. startingSystemEnergy = calcTotalKineticEnergy() - calcTotalPotentialEnergy();
         steps = 0;
+
+		simulationSetupComplete = true;
     }
+
+    struct Builder {
+        static void addCelestialObject(Simulation& sim, CelestialObject obj) {
+			assert(obj.isSetupComplete() && "Error: Cannot add incomplete CelestialObject to Simulation!");
+			//Check if CelestialObject with same name already exists
+            for (const CelestialObject& existingObj : sim.celestialObjectContainer) {
+                if(existingObj == obj) {
+                    throw std::invalid_argument("Error: CelestialObject with name '" + obj.getName() + "' already exists in the Simulation!");
+				}
+            }
+			sim.celestialObjectContainer.push_back(obj);
+			sim.celestialObjectPairContainer = getPairs(sim.celestialObjectContainer); //Update PairContainer
+		}
+
+        static void removeCelestialObject(Simulation& sim, CelestialObject obj) {
+            throw "Error: removeCelestialObject is not implemented yet!!!";
+        }
+
+        static void finalizeSetup(Simulation& sim) {
+            //TODO: Implement Energy calculation for Simulation analysis
+			//TODO: Eventually implement asserts
+        }
+    };
 
 #pragma region EnergyFunctions
     //Calculate total Kinetic Energy of all CelestialObjects/System
