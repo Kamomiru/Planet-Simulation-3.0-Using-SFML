@@ -78,6 +78,26 @@ std::vector<double>& operator-(const std::vector<double>& a, const std::vector<d
 	return result;
 }
 
+//overload * operator to do scalar multiplication between scalar and vector.
+//ONLY FOR FOLLOWING ORDER: [scalar * vector]
+std::vector<double>& operator*(const double s, const std::vector<double>& v) {
+	std::vector<double> result(v.size());
+	for (int i{ 0 }; i < v.size(); i++) {
+		result[i] = s * v[i];
+	}
+	return result;
+}
+
+//overload * operator to do scalar multiplication between scalar and vector.
+//ONLY FOR FOLLOWING ORDER: [vector * scalar]
+std::vector<double>& operator*(const std::vector<double>& v, const double s) {
+	std::vector<double> result(v.size());
+	for (int i{ 0 }; i < v.size(); i++) {
+		result[i] = s * v[i];
+	}
+	return result;
+}
+
 //overload += operator to support elementwise addition via += symbol
 std::vector<double>& operator+=(std::vector<double>& a, const std::vector<double>& b) { //vectors a and b are being passed by reference due to the & sign.  Function also returns a reference type
 	if (a.size() != b.size()) { //Check if vectors a and b have the same dimension

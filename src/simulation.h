@@ -151,6 +151,10 @@ public:
 		return shape; //TODO: Implement to return both shape and trajectory
 	}
 
+    std::vector<std::vector<double>> getPreviousPositions() {
+        return previousPositions;
+    }
+
 	bool isSetupComplete() {
         return objectSetupComplete;
 	}
@@ -219,40 +223,35 @@ public:
 
 #pragma region Calculation Functions
 
-    std::vector<double> distanceVector(CelestialObject a, CelestialObject b) {
-        return b.getPosition() - a.getPosition();
-	}
-
-    double distance(CelestialObject a, CelestialObject b) {
-        return vectorLength(distanceVector(a, b));
-    }
-
 	//Calculate total Acceleration on CelestialObject obj due to all other CelestialObjects in the system
     std::vector<double> calcTotalAccel(CelestialObject obj) {
 		std::vector<double> totalAccelVector{ 0.0,0.0 };  
         
         for (CelestialObject& otherObj : celestialObjectContainer) {
             if (!(otherObj == obj)) {
-				float distance = this->distance(obj, otherObj);
-				double accelerationMagnitude = constants::gravConstant * otherObj.getMass() / (distance * distance);
+                std::vector<double> distanceVector = otherObj.getPosition() - obj.getPosition();
+                double distanceSquared = distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1];
+                double distance = std::sqrt(distanceSquared);
+				double accelerationMagnitude = constants::gravConstant * otherObj.getMass() / distanceSquared;
 
-                double angle{ vectorAngle(this->distanceVector(obj, otherObj)) };
-                double cosValue{ std::cos(angle) };
-                double sinValue{ std::sin(angle) };
-				//Optional: Cutoff for very small values
-                /*if (cosValue < 10e-12 && cosValue > -10e-12) {
-                    cosValue = 0;
-                }
-                if (sinValue < 10e-12 && sinValue > -10e-12) {
-                    sinValue = 0;
-                }*/
+                std::vector<double> normalizedVector = 1.0l / distance * distanceVector; //Using the normalized distanceVector as a base for our calculated Acceleration increases our performance, since we dont have to evaluate expensive functions such as sin(), cos() and atan()
 
-                totalAccelVector[0] += cosValue * accelerationMagnitude;
-                totalAccelVector[1] += sinValue * accelerationMagnitude;
+                totalAccelVector += normalizedVector * accelerationMagnitude;
             }
         }
 
 		return totalAccelVector;
+    }
+
+    std::vector<double> incrementPositionVerlet(CelestialObject& obj) {
+        assert(!obj.getPreviousPositions().empty() && "Error: CelestialObject has no previous Position, wich is required to apply Verlet Integration");
+        assert(steps != 0 && "Error: Simulation is still at step 0. Verlet can only be applied at steps equal to or greater than 1!");
+		
+        std::vector<double> nextPos{ 0.0,0.0 };
+        std::vector<double> currentPos = obj.getPosition();
+		std::vector<double> previousPos = obj.getPreviousPositions()[steps - 1];
+		std::vector<double> acc = this->calcTotalAccel(obj);
+        nextPos = 2 * currentPos - previousPos +  acc * constants::dt * constants::dt;
     }
 
 #pragma endregion
