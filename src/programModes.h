@@ -27,6 +27,25 @@ public:
 
 };
 
+class SimulationSetupMode : public BaseMode {
+private:
+
+public:
+	SimulationSetupMode() {
+		modeID = ProgramModeID::SimulationSetup;
+	}
+
+	void handleEvent(const sf::Event& event) override {
+		// handle events specific to simulation setup mode
+	}
+
+	void render(sf::RenderWindow& window) override {
+		window.clear(sf::Color::White);
+		// Render simulation setup specific content here
+		window.display();
+	}
+};
+
 class DisplayTestMode : public BaseMode {
 private:
 	sf::CircleShape circle;
@@ -46,3 +65,4 @@ public:
 		window.display();
 	}
 }; 
+

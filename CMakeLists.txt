@@ -18,6 +18,11 @@ src/baseMode.h
 src/modeHandler.h
 src/programModes.h
 src/programWindow.h
+src/simulation.h
+src/simulationOLD.h
+src/constants.h
+helpers/vectorHelper.cpp
+helpers/vectorHelper.h
 )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)

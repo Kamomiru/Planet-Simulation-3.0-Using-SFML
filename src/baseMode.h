@@ -4,6 +4,7 @@ enum class ProgramModeID {
 	Base,
 	Startup,
 	DisplayTest,
+	SimulationSetup,
 	//Simulation,
 	//Settings
 };
