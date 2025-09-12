@@ -20,6 +20,7 @@ private:
     double radius = -1;
     std::vector<double> position;
 	std::vector<double> velocity; //TODO: is this needed for velet integration? Maybe store previous position instead of velocity?
+	std::vector<std::vector<double>> previousPositions; //Holds all previous positions of the object for analysis purposes
 
     double startingKineticEnergy = -1;
     
@@ -59,21 +60,25 @@ public:
 
     struct Builder {
 		static void setName(CelestialObject& obj, const std::string& n) { 
+			assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
             assert(obj.name == "default" && "Error: Name is already defined!");
             obj.name = n; }
 
         static void setColor(CelestialObject& obj, sf::Color c) { 
+            assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
             assert(obj.color == sf::Color::White && "Error: Color is already defined!");
             obj.color = c; 
             obj.shape.setFillColor(c);
 		}
         
         static void setMass(CelestialObject& obj, double m) {
+            assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
             assert(obj.mass == -1 && "Error: Mass has alrady been set!");
 			obj.mass = m;
 		}
         
         static void setRadius(CelestialObject& obj, double r) {
+            assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
             assert(obj.radius == -1 && "Error: Radius has alrady been set!");
             obj.radius = r;
             obj.shape.setRadius(obj.radius);
@@ -81,12 +86,14 @@ public:
         }
 
         static void setPosition(CelestialObject& obj, std::vector<double> pos) {
+            assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
             assert(obj.position.empty() && "Error: Position has alrady been set!");
 			obj.position = pos;
             obj.shape.setPosition(vectorToSfVector(obj.position));
         }
 
         static void setVelocity(CelestialObject& obj, std::vector<double> vel) {
+            assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
 			assert(obj.velocity.empty() && "Error: Velocity has alrady been set!");
             obj.velocity = vel;
         }
@@ -159,6 +166,7 @@ public:
 class Simulation {
 public:
     int steps;
+	double dt = constants::dt; //Time step in seconds
     double startingSystemEnergy = -1;
     std::vector<CelestialObject> celestialObjectContainer;
     std::vector<pairContainer<CelestialObject>> celestialObjectPairContainer;
@@ -202,6 +210,52 @@ public:
 			//TODO: Eventually implement asserts
         }
     };
+
+
+
+    void incrementVerlet() {
+        steps++;
+	}
+
+#pragma region Calculation Functions
+
+    std::vector<double> distanceVector(CelestialObject a, CelestialObject b) {
+        return b.getPosition() - a.getPosition();
+	}
+
+    double distance(CelestialObject a, CelestialObject b) {
+        return vectorLength(distanceVector(a, b));
+    }
+
+	//Calculate total Acceleration on CelestialObject obj due to all other CelestialObjects in the system
+    std::vector<double> calcTotalAccel(CelestialObject obj) {
+		std::vector<double> totalAccelVector{ 0.0,0.0 };  
+        
+        for (CelestialObject& otherObj : celestialObjectContainer) {
+            if (!(otherObj == obj)) {
+				float distance = this->distance(obj, otherObj);
+				double accelerationMagnitude = constants::gravConstant * otherObj.getMass() / (distance * distance);
+
+                double angle{ vectorAngle(this->distanceVector(obj, otherObj)) };
+                double cosValue{ std::cos(angle) };
+                double sinValue{ std::sin(angle) };
+				//Optional: Cutoff for very small values
+                /*if (cosValue < 10e-12 && cosValue > -10e-12) {
+                    cosValue = 0;
+                }
+                if (sinValue < 10e-12 && sinValue > -10e-12) {
+                    sinValue = 0;
+                }*/
+
+                totalAccelVector[0] += cosValue * accelerationMagnitude;
+                totalAccelVector[1] += sinValue * accelerationMagnitude;
+            }
+        }
+
+		return totalAccelVector;
+    }
+
+#pragma endregion
 
 #pragma region EnergyFunctions
     //Calculate total Kinetic Energy of all CelestialObjects/System

@@ -19,7 +19,7 @@ double vectorAngle(std::vector<double> vector) {
 
 	if (vector[0] >= 0) { //Quadrants 1 and 4
 
-		if ((result < 10e-6) && (result > -10e-6)) { //Implementing cutoff Value so function returns 0 for small angles
+		if ((result < 10e-7) && (result > -10e-7)) { //Implementing cutoff Value so function returns 0 for small angles
 			return 0;
 			std::cout << "0-Value Cutoff!\n";
 		}
@@ -33,7 +33,7 @@ double vectorAngle(std::vector<double> vector) {
 		}
 	}
 	else if (vector[0] < 0) { //Quadrants 2 and 3
-		if ((result < 10e-6) && (result > -10e-6)) { //Implementing cutoff Value so function returns 0 for small angles
+		if ((result < 10e-7) && (result > -10e-7)) { //Implementing cutoff Value so function returns 0 for small angles
 			return 0 + pi;
 			std::cout << "0-Value Cutoff!\n";
 		}
