@@ -22,7 +22,7 @@ private:
 	std::vector<double> velocity; //TODO: is this needed for velet integration? Maybe store previous position instead of velocity?
 	std::vector<std::vector<double>> previousPositions; //Holds all previous positions of the object for analysis purposes
 
-    double startingKineticEnergy = -1;
+    double startingKineticEnergy = 0;
     
     sf::VertexArray trajectory;
 
@@ -115,7 +115,7 @@ public:
     };
 
     double calcStartingKineticEnergy() {
-		assert(startingKineticEnergy == -1 && "Error: StartingKineticEnergy has already been calculated!"); //Make sure this function is only called once!
+		assert(startingKineticEnergy == 0 && "Error: StartingKineticEnergy has already been calculated!"); //Make sure this function is only called once!
 		startingKineticEnergy = 0.5l * mass * (velocity[0] * velocity[0] + velocity[1] * velocity[1]);
 		return startingKineticEnergy;
     }
@@ -252,6 +252,20 @@ public:
 		std::vector<double> previousPos = obj.getPreviousPositions()[steps - 1];
 		std::vector<double> acc = this->calcTotalAccel(obj);
         nextPos = 2 * currentPos - previousPos +  acc * constants::dt * constants::dt;
+
+        return nextPos;
+    }
+
+    std::vector<double> incrementFirstPositionVerlet(CelestialObject& obj) {
+        assert(obj.getPreviousPositions().empty() && "Error: CelestialObject must not have any logged Position yet!");
+		assert(steps == 0 && "Error: Simulation is not at step 0. This function can only be applied at step 0!");
+
+		std::vector<double> nextPos{ 0.0,0.0 };
+		std::vector<double> currentPos = obj.getPosition();
+        std::vector<double> acc = this->calcTotalAccel(obj);
+        nextPos = currentPos + obj.getVelocity() * constants::dt + 0.5l * acc * constants::dt * constants::dt;
+
+		return nextPos;
     }
 
 #pragma endregion
