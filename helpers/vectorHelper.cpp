@@ -1,4 +1,4 @@
-#include "vectorHelper.h"
+#include "../helpers/vectorHelper.h"
 
 
 double vectorLength(std::vector<double> vector) {

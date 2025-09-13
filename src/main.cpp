@@ -12,9 +12,11 @@ int main()
 
 	CelestialObject earth("earth", constants::earth::mass, constants::earth::radius, { 300.0f,600.0f }, { 10.0,-2.0 }, sf::Color::Blue);
 	CelestialObject moon("moon", constants::moon::mass, constants::moon::radius, { 100.0f, 80.0f }, { 4.0,-1.0 }, sf::Color::White);
+	CelestialObject earth2("earth2", constants::earth::mass, constants::earth::radius, { 800.0f,300.0f }, { -6.0,3.0 }, sf::Color::Red);
 
 	Simulation::Builder::addCelestialObject(sim, earth);
 	Simulation::Builder::addCelestialObject(sim, moon);
+	Simulation::Builder::addCelestialObject(sim, earth2);
 	Simulation::Builder::finalizeSetup(sim);
     
 	SimulationTestMode::initializeSimulation(sim); //Initialize static sim variable in SimulationTestMode

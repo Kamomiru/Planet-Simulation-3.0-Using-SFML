@@ -278,10 +278,7 @@ public:
         std::vector<double> currentPos = obj.getPosition();
 		std::vector<double> previousPos = obj.getPreviousPositions()[steps - 1];
 		std::vector<double> acc = this->calcTotalAccel(obj);
-        //nextPos = 2 * currentPos - previousPos +  acc * dt * dt;
-        for (int i{ 0 }; i <= 1; i++) {
-			nextPos[i] = 2 * currentPos[i] - previousPos[i] + acc[i] * dt * dt;
-        }
+		nextPos = 2.0l * currentPos - previousPos + acc * dt * dt;
 
         return nextPos;
     }
@@ -293,11 +290,9 @@ public:
 		std::vector<double> nextPos{ 0.0,0.0 };
 		std::vector<double> currentPos = obj.getPosition();
         std::vector<double> acc = this->calcTotalAccel(obj);
-        //nextPos = currentPos + obj.getVelocity() * dt + 0.5l * acc * dt * dt;
-        for (int i{ 0 }; i <= 1; i++) {
-			nextPos[i] = currentPos[i] + obj.getVelocity()[i] * dt + 0.5l * acc[i] * dt * dt;
-        }
-		return nextPos;
+        nextPos = currentPos + obj.getVelocity() * dt + acc * dt * dt * 0.5l;
+		
+        return nextPos;
     }
 
     void updateSimulationVerlet() {
