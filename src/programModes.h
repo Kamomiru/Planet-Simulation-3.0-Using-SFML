@@ -2,20 +2,26 @@
 #include "baseMode.h"
 #include <SFML/Graphics.hpp>
 #include "simulation.h"
+#include "programConfig.h"
+#include "../helpers/customVertexArrays.h"
 
 
 
 
 static class StartupMode : public BaseMode {
 private:
+	sf::VertexArray backgroundRect;
 	sf::RectangleShape rectangle;
+	float rectangleHeight = 500.f;
 public:
 
 	StartupMode() { 
 		modeID = ProgramModeID::Startup;
-		rectangle.setSize(sf::Vector2f(200.f, 100.f));
-		rectangle.setFillColor(sf::Color::Black);
-		rectangle.setPosition({ 800.0f, 600.0f }); // Center of a 1920x1080 view
+		backgroundRect = createRoundedRectangleBorder({ 0.0f,0.0f }, 10.0f, rectangleHeight * 1.618, rectangleHeight, 10.0f, sf::Color(50, 50, 50), 8);
+		//rectangle.setSize(sf::Vector2f(rectangleHeight * 1.618, rectangleHeight));
+		//rectangle.setOrigin(sf::Vector2f(rectangle.getSize().x / 2.0f, rectangle.getSize().y / 2.0f)); // Center the origin
+		//rectangle.setFillColor(sf::Color::Black);
+		//rectangle.setPosition(windowCenter);
 	}
 
 	void handleEvent(const sf::Event& event) override {
@@ -28,7 +34,7 @@ public:
 
 	void render(sf::RenderWindow& window) override {
 		window.clear(sf::Color::White);
-		window.draw(rectangle);
+		window.draw(backgroundRect);
 		window.display();
 	}
 

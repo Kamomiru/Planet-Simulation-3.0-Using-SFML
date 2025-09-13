@@ -10,6 +10,8 @@ enum class ProgramModeID {
 	//Settings
 };
 
+//Class Interface for different program modes
+//All virtual functions (that are also declared as = 0;) must be overwritten in derived classes
 static class BaseMode {
 public:
 

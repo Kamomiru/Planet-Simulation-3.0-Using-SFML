@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "programConfig.h"
 
 inline sf::VideoMode desktop;
 inline sf::View view;
@@ -16,7 +17,7 @@ inline sf::Vector2f currentMousePos;
 inline void initSFMLWindow() {
 	//setup MSAA --> smoother Graphics at the cost of performance
 	sf::ContextSettings settings;
-	settings.antiAliasingLevel = 8;
+	settings.antiAliasingLevel = conf::graphics::antialiasingLevel;
 
 	//Setup Standard View
 	view = sf::View({ 860.f, 540.f }, { 1920.0f, 1080.0f });
@@ -27,7 +28,7 @@ inline void initSFMLWindow() {
 
 	//initializing window object
 	window = sf::RenderWindow(desktop, "PlanetSimulation", sf::State::Windowed, settings);
-	window.setFramerateLimit(144);
+	window.setFramerateLimit(conf::graphics::frameRateLimit);
 
 	//initialize windowCenter
 	windowCenter = static_cast<sf::Vector2f>(desktop.size) / 2.0f;

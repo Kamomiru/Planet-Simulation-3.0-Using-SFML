@@ -21,8 +21,11 @@ src/programWindow.h
 src/simulation.h
 src/simulationOLD.h
 src/constants.h
+src/programConfig.h
 helpers/vectorHelper.cpp
 helpers/vectorHelper.h
+helpers/customVertexArrays.cpp
+helpers/customVertexArrays.h
 )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
