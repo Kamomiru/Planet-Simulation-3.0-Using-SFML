@@ -2,11 +2,13 @@
 #include "programWindow.h"
 #include "modeHandler.h"
 #include "simulation.h"
+#include "programConfig.h"
 
 
 int main()
 {   
 	initSFMLWindow();
+	
 
 	Simulation sim; //Default Constructor
 

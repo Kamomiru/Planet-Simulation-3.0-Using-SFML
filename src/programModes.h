@@ -3,25 +3,39 @@
 #include <SFML/Graphics.hpp>
 #include "simulation.h"
 #include "programConfig.h"
-#include "../helpers/customVertexArrays.h"
+//#include "../helpers/customVertexArrays.h"
+#include "../sfml-entities/customSFMLEntities.h"
+#include <any>
 
-
-
+//inline sf::Font font("../resources/CascadiaCode-Regular.ttf");
 
 static class StartupMode : public BaseMode {
 private:
-	sf::VertexArray backgroundRect;
-	sf::RectangleShape rectangle;
-	float rectangleHeight = 500.f;
+	RoundedRect roundedRect;
+	float rectangleLength = 1000.0f;
+	//sf::Text title2(*conf::font::CascadiaRegularPtr); This doesn't work
+	std::any title;			 //Same weird Workaround as in SFML Sanbox. Is necessary due to sf::Text not having a copy constructor/default constructor.
+	//TODO: Add explanation for std::any workaround
 public:
 
 	StartupMode() { 
 		modeID = ProgramModeID::Startup;
-		backgroundRect = createRoundedRectangleBorder({ 0.0f,0.0f }, 10.0f, rectangleHeight * 1.618, rectangleHeight, 10.0f, sf::Color(50, 50, 50), 8);
-		//rectangle.setSize(sf::Vector2f(rectangleHeight * 1.618, rectangleHeight));
-		//rectangle.setOrigin(sf::Vector2f(rectangle.getSize().x / 2.0f, rectangle.getSize().y / 2.0f)); // Center the origin
-		//rectangle.setFillColor(sf::Color::Black);
-		//rectangle.setPosition(windowCenter);
+
+		roundedRect = RoundedRect(windowCenter, rectangleLength * 1.618f, rectangleLength, 8, 16, sf::Color(38, 45, 53, 255));
+		roundedRect.setOriginToCenter();
+
+		title = sf::Text(*conf::font::CascadiaRegularPtr);
+		std::any_cast<sf::Text&>(title).setFillColor(sf::Color::White);
+		std::any_cast<sf::Text&>(title).setPosition(windowCenter);
+		std::any_cast<sf::Text&>(title).setCharacterSize(40);
+		std::any_cast<sf::Text&>(title).setString("Orbit Simulation");
+
+		sf::FloatRect titleBounds = std::any_cast<sf::Text&>(title).getLocalBounds();
+
+		std::any_cast<sf::Text&>(title).setOrigin({ titleBounds.size.x / 2.0f, titleBounds.size.y / 2.0f });
+
+		std::cout << "Title Bounds: " << titleBounds.size.x << ", " << titleBounds.size.y << std::endl;
+
 	}
 
 	void handleEvent(const sf::Event& event) override {
@@ -34,7 +48,8 @@ public:
 
 	void render(sf::RenderWindow& window) override {
 		window.clear(sf::Color::White);
-		window.draw(backgroundRect);
+		window.draw(roundedRect);
+		window.draw(std::any_cast<sf::Text>(title));
 		window.display();
 	}
 

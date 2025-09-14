@@ -1,77 +1,78 @@
 #include "customVertexArrays.h"
 
+sf::VertexArray createQuarterArc(sf::Vector2f centerPosition, float radius, int quadrant, int Verticies, sf::Color color) {
+	assert(quadrant >= 1 && quadrant <= 4 && "Error: Quadrant may only be between 1 and 4!");
+	assert(Verticies >= 4 && "Error: Not Enough Verticies!");
 
-sf::VertexArray createRoundedRectangle(sf::Vector2f Position, float curveRadius, float boxLength, float boxHeigth, sf::Color color, int qualityScaler = 8) {
-    double pi{ 3.141592653589793 };
-    //TODO: implement asserts
+	const double pi = 3.14159265358979323846;
 
-    //Setting up Vertex Array
-    int arraySize{ 4 * 4 * qualityScaler + 4 };
-    sf::VertexArray array(sf::PrimitiveType::TriangleStrip, arraySize);
+	double startAngle = 0.0;
 
-    float offsetX{ 0 };
-    float offsetY{ 0 };
-    int quadrant{ 1 };
+	sf::VertexArray arc;
 
-    for (int i{ 0 }, angleStep{ 0 }; i < arraySize; i++) {
-        if (i == 0 || i == 4 * qualityScaler + 1 || i == 4 * qualityScaler * 2 + 2 || i == 4 * qualityScaler * 3 + 3) { //Quadrant start Values
-            //Setting Offsets
-            switch (quadrant) {
-            case 1:
-                offsetX = { 0.0f };
-                offsetY = { 0.0f };
-                break;
-            case 2:
-                offsetX = { boxLength - 2 * curveRadius };
-                offsetY = { 0.0f };
-                break;
-            case 3:
-                offsetX = { boxLength - 2 * curveRadius };
-                offsetY = { boxHeigth - 2 * curveRadius };
-                break;
-            case 4:
-                offsetX = { 0.0f };
-                offsetY = { boxHeigth - 2 * curveRadius };
-                break;
-            }
-            //define Quadrant start Point
-            array[i].position = sf::Vector2f(-std::cos(2.0f * pi * (((float)angleStep) / (arraySize - 4.0f))) * curveRadius + curveRadius + Position.x + offsetX,
-                -std::sin(2.0f * pi * (((float)angleStep) / (arraySize - 4.0f))) * curveRadius + curveRadius + Position.y + offsetY);
-            array[i].color = color;
-            quadrant++; //Increment quadrant, so the next time we are at a start point the X and Y offsets can be adjusted
-        }
-        else { //define remaining Quadrand Points
-            angleStep++;
-            array[i].position = sf::Vector2f(-std::cos(2.0f * pi * (((float)angleStep) / (arraySize - 4.0f))) * curveRadius + curveRadius + Position.x + offsetX,
-                -std::sin(2.0f * pi * (((float)angleStep) / (arraySize - 4.0f))) * curveRadius + curveRadius + Position.y + offsetY);
-            array[i].color = color;
+	sf::Vertex startVertex;
+	sf::Vertex endVertex;
 
-        }
+	switch (quadrant) {
+	case 1:
+		startVertex.position = { centerPosition.x + radius, centerPosition.y };
+		endVertex.position = { centerPosition.x , centerPosition.y + radius };
+		startAngle = 0.0;
+		break;
+	case 2:
+		startVertex.position = { centerPosition.x , centerPosition.y + radius };
+		endVertex.position = { centerPosition.x - radius, centerPosition.y };
+		startAngle = pi / 2.0f;
+		break;
+	case 3:
+		startVertex.position = { centerPosition.x - radius, centerPosition.y };
+		endVertex.position = { centerPosition.x , centerPosition.y - radius };
+		startAngle = pi;
+		break;
+	case 4:
+		startVertex.position = { centerPosition.x , centerPosition.y - radius };
+		endVertex.position = { centerPosition.x + radius, centerPosition.y };
+		startAngle = 3.0f * pi / 2.0f;
+		break;
+	}
 
-    }
-    return array;
+	arc.append(startVertex);
+
+	double startingAngle = (quadrant - 1) * (pi / 2);
+
+	for (int i{ 1 }; i <= Verticies - 2; i++) {
+		float x = radius * std::cos(startAngle + i * pi / 2.0f / (Verticies - 1));
+		float y = radius * std::sin(startAngle + i * pi / 2.0f / (Verticies - 1));
+		sf::Vertex v;
+		v.position = { centerPosition.x + x, centerPosition.y + y };
+		arc.append(v);
+	}
+
+	arc.append(endVertex);
+
+	for (int i = 0; i < arc.getVertexCount(); i++) {
+		arc[i].color = color;
+	}
+
+	return arc;
 }
 
-sf::VertexArray createRoundedRectangleBorder(sf::Vector2f Position, float curveRadius, float boxLength, float boxHeigth, float lineThickness, sf::Color color, int qualityScaler = 8) {
-    //TODO: implement asserts
+sf::VertexArray createRoundedRect(sf::Vector2f Position, float Length, float Heigth, float LineThickness, float cornerRadius, sf::Color color) {
+	
+	sf::VertexArray array;
+	std::vector<sf::Vector2f> arcCenters{ {Position.x + Length - cornerRadius, Position.y + Heigth - cornerRadius},
+										  {Position.x +        + cornerRadius, Position.y + Heigth - cornerRadius},
+										  {Position.x +		   + cornerRadius, Position.y +		   + cornerRadius},
+										  {Position.x + Length - cornerRadius, Position.y +		   + cornerRadius}
+	};
 
-    //Create Inner and outer vertex Arrays
-    sf::VertexArray outerRect = createRoundedRectangle(Position, curveRadius, boxLength, boxHeigth, color);
-    sf::VertexArray innerRect = createRoundedRectangle({ Position.x + lineThickness, Position.y + lineThickness }, curveRadius - lineThickness, boxLength - 2 * lineThickness, boxHeigth - 2 * lineThickness, color);
+	for (int i = 0; i < 4; i++) {
+		sf::VertexArray arc = createQuarterArc(arcCenters[i], cornerRadius, i + 1, 24, color);
+		for (int v = 0; v < arc.getVertexCount(); v++) {
+			array.append(arc[v]);
+		}
+		
+	}
 
-    //Create border vertex Array
-    sf::VertexArray border(sf::PrimitiveType::TriangleStrip, outerRect.getVertexCount() * 2);
-
-    //Combine vertex Arrays into one suitable for sf::PrimitiveType::TriangleStrip
-    for (int i{ 0 }, j{ 0 }; i < outerRect.getVertexCount() * 2;) {
-        border[i] = outerRect[j];
-        i++;
-        border[i] = innerRect[j];
-        i++, j++;
-    }
-    //Add first two points again to close Border
-    border.append(sf::Vertex{ {Position.x, Position.y + curveRadius}, color });
-    border.append(sf::Vertex{ {Position.x + lineThickness, Position.y + curveRadius}, color });
-
-    return border;
+	return array;
 }
