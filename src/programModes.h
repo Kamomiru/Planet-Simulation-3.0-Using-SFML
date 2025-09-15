@@ -12,29 +12,38 @@
 static class StartupMode : public BaseMode {
 private:
 	RoundedRect roundedRect;
-	float rectangleLength = 1000.0f;
+	float rectangleMargin = 32.0f;
+	float rectanglePadding = 48.0f;
+	float rectangleLength = windowSize.x - 2 * rectangleMargin;
+	float rectangleHeigth = windowSize.y - 2 * rectangleMargin;
+	
 	//sf::Text title2(*conf::font::CascadiaRegularPtr); This doesn't work
-	std::any title;			 //Same weird Workaround as in SFML Sanbox. Is necessary due to sf::Text not having a copy constructor/default constructor.
+	std::any title = sf::Text(*conf::font::CascadiaSemiBoldPtr);			 //Same weird Workaround as in SFML Sanbox. Is necessary due to sf::Text not having a copy constructor/default constructor.
 	//TODO: Add explanation for std::any workaround
+
+	std::any infoText = sf::Text(*conf::font::CascadiaRegularPtr);
 public:
 
 	StartupMode() { 
 		modeID = ProgramModeID::Startup;
-
-		roundedRect = RoundedRect(windowCenter, rectangleLength * 1.618f, rectangleLength, 8, 16, sf::Color(38, 45, 53, 255));
+		
+		roundedRect = RoundedRect(windowCenter, rectangleLength , rectangleHeigth, 8, 16, sf::Color(38, 45, 53, 255));
 		roundedRect.setOriginToCenter();
 
-		title = sf::Text(*conf::font::CascadiaRegularPtr);
+		//Title Text Setup
 		std::any_cast<sf::Text&>(title).setFillColor(sf::Color::White);
-		std::any_cast<sf::Text&>(title).setPosition(windowCenter);
+		std::any_cast<sf::Text&>(title).setPosition({ windowCenter.x, windowCenter.y - windowSize.y / 2.0f * 5.0f/6.0f });
 		std::any_cast<sf::Text&>(title).setCharacterSize(40);
 		std::any_cast<sf::Text&>(title).setString("Orbit Simulation");
-
+		//Center Title Origin
 		sf::FloatRect titleBounds = std::any_cast<sf::Text&>(title).getLocalBounds();
-
 		std::any_cast<sf::Text&>(title).setOrigin({ titleBounds.size.x / 2.0f, titleBounds.size.y / 2.0f });
 
-		std::cout << "Title Bounds: " << titleBounds.size.x << ", " << titleBounds.size.y << std::endl;
+		//Text Setup
+		std::any_cast<sf::Text&>(infoText).setFillColor(sf::Color::White);
+		std::any_cast<sf::Text&>(infoText).setPosition({ rectangleMargin + rectanglePadding, rectangleMargin + rectanglePadding + 30.0f + 60.0f});
+		std::any_cast<sf::Text&>(infoText).setCharacterSize(20);
+		std::any_cast<sf::Text&>(infoText).setString("This is a program to simulate the orbits of celestial objects. \nIt currently uses Verlet Integration to approximate the orbits.\nYou can set the starting attributes yourself or load presets.");
 
 	}
 
@@ -50,6 +59,7 @@ public:
 		window.clear(sf::Color::White);
 		window.draw(roundedRect);
 		window.draw(std::any_cast<sf::Text>(title));
+		window.draw(std::any_cast<sf::Text&>(infoText));
 		window.display();
 	}
 

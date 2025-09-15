@@ -22,6 +22,7 @@ namespace conf {
 		
 		std::unique_ptr<sf::Font> RobotoMediumPtr = loadFont("Roboto-Medium.ttf");
 		std::unique_ptr<sf::Font> CascadiaRegularPtr = loadFont("CascadiaCode-Regular.ttf");
+		std::unique_ptr<sf::Font> CascadiaSemiBoldPtr = loadFont("CascadiaCode-SemiBold.ttf");
 
 	}
 }

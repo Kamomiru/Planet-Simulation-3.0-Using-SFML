@@ -8,6 +8,7 @@ inline sf::View view;
 inline sf::View viewGui;
 inline sf::RenderWindow window;
 inline sf::Vector2f windowCenter;
+inline sf::Vector2f windowSize;
 
 //Setting up Variables for View Movement
 inline bool mouseDragged = false;
@@ -30,9 +31,14 @@ inline void initSFMLWindow() {
 	window = sf::RenderWindow(desktop, "PlanetSimulation", sf::State::Windowed, settings);
 	window.setFramerateLimit(conf::graphics::frameRateLimit);
 
+	//initialize windowSize
+	windowSize = static_cast<sf::Vector2f>(desktop.size);
+
 	//initialize windowCenter
-	windowCenter = static_cast<sf::Vector2f>(desktop.size) / 2.0f;
+	windowCenter = windowSize / 2.0f;
 	std::cout << "Window Center: " << windowCenter.x << ", " << windowCenter.y << std::endl;
+
+	
 }
 
 //TODO: Check if updateView should be defined here?
