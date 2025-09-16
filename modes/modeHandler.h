@@ -1,5 +1,8 @@
 #pragma once
-#include "programModes.h"
+#include "StartupMode.h"
+#include "DisplayTestMode.h"
+#include "SimulationTestMode.h"
+#include "SimulationSetupMode.h"
 
 class ModeHandler {
 private:

@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "programWindow.h"
-#include "modeHandler.h"
+#include "../modes/modeHandler.h"
 #include "simulation.h"
 #include "programConfig.h"
 
