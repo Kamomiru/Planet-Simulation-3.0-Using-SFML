@@ -1,6 +1,7 @@
 #pragma once
 
 enum class ProgramModeID {
+	NONE,
 	Base,
 	Startup,
 	DisplayTest,
@@ -12,10 +13,10 @@ enum class ProgramModeID {
 
 //Class Interface for different program modes
 //All virtual functions (that are also declared as = 0;) must be overwritten in derived classes
-static class BaseMode {
+class BaseMode {
 public:
 
-	virtual void handleEvent(const sf::Event& event) = 0;
+	virtual ProgramModeID handleEvent(const sf::Event& event) = 0;
 	virtual void update() = 0;
 	virtual void render(sf::RenderWindow& window) = 0;
 	virtual ~BaseMode() = default;
