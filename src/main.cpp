@@ -9,6 +9,7 @@ int main()
 {   
 	initSFMLWindow();
 	
+	ModeHandler modeHandler(std::make_unique<StartupMode>()); // Start in StartupMode
 
 	Simulation sim; //Default Constructor
 
@@ -22,8 +23,6 @@ int main()
 	Simulation::Builder::finalizeSetup(sim);
     
 	SimulationTestMode::initializeSimulation(sim); //Initialize static sim variable in SimulationTestMode
-
-	ModeHandler modeHandler(std::make_unique<StartupMode>()); // Start in StartupMode
 
     while (window.isOpen())
     {

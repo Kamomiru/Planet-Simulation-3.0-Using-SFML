@@ -14,14 +14,17 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(main
 src/main.cpp
-src/baseMode.h
-src/modeHandler.h
-src/programModes.h
 src/programWindow.h
 src/simulation.h
 src/simulationOLD.h
 src/constants.h
 src/programConfig.h
+modes/baseMode.h
+modes/DisplayTestMode.h
+modes/modeHandler.h
+modes/SimulationSetupMode.h
+modes/SimulationTestMode.h
+modes/StartupMode.h
 helpers/vectorHelper.cpp
 helpers/vectorHelper.h
 helpers/customVertexArrays.cpp
