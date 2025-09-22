@@ -10,7 +10,7 @@ static class StartupMode : public BaseMode {
 private:
 	RoundedRect roundedRect;
 	float rectangleMargin = 32.0f;
-	float rectanglePadding = 48.0f;
+	float rectanglePadding = conf::ui::generalSidePadding;
 	float rectangleLength = windowSize.x - 2 * rectangleMargin;
 	float rectangleHeigth = windowSize.y - 2 * rectangleMargin;
 	sf::Clock timer;
@@ -28,7 +28,7 @@ public:
 	StartupMode() {
 		modeID = ProgramModeID::Startup;
 
-		roundedRect = RoundedRect(windowCenter, rectangleLength, rectangleHeigth, 8, 16, sf::Color(38, 45, 53, 255));
+		roundedRect = RoundedRect(windowCenter, rectangleLength, rectangleHeigth, 16, conf::ui::windowBackgroundColor);
 		roundedRect.setOriginToCenter();
 
 		//Title Text Setup

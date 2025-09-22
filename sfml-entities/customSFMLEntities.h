@@ -9,10 +9,10 @@ private:
     sf::VertexArray m_vertices;
     sf::Texture     m_texture;
     sf::Vector2f position;
-    float length;
-    float heigth;
-    float lineThickness;
-    float cornerRadius;
+    float length = 0;
+    float heigth = 0;
+    float lineThickness = 0;
+    float cornerRadius = 0;
     sf::Color color;
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
@@ -31,9 +31,9 @@ private:
 public:
     RoundedRect() = default;
 
-    RoundedRect(sf::Vector2f Position, float Length, float Heigth, float LineThickness, float CornerRadius, sf::Color Color)
-        : position(Position), length(Length), heigth(Heigth), lineThickness(LineThickness), cornerRadius(CornerRadius), color(Color) {
-        m_vertices = createRoundedRect(position, length, heigth, lineThickness, cornerRadius, color);
+    RoundedRect(sf::Vector2f Position, float Length, float Heigth, float CornerRadius, sf::Color Color)
+        : position(Position), length(Length), heigth(Heigth), cornerRadius(CornerRadius), color(Color) {
+        m_vertices = createRoundedRect(position, length, heigth, cornerRadius, color);
         m_vertices.setPrimitiveType(sf::PrimitiveType::TriangleFan);
     }
 

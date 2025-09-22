@@ -25,4 +25,17 @@ namespace conf {
 		std::unique_ptr<sf::Font> CascadiaSemiBoldPtr = loadFont("CascadiaCode-SemiBold.ttf");
 
 	}
+	namespace ui {
+		sf::Color programBackgroundColor = sf::Color::White;
+		sf::Color windowBackgroundColor(38, 45, 53, 255);
+		sf::Color windowBorderColor(0, 0, 0, 255);
+		sf::Color grey(137, 137, 137, 255);
+		sf::Color darkGrey(53, 53, 53, 255);
+		sf::Color darkDarkGrey(38, 38, 38, 255);
+
+		float generalSidePadding = 48.0f;
+		float generalSideMargin = 24.0f;
+
+		uint16_t standardFontSizeMedium = 16;
+	}
 }

@@ -6,4 +6,6 @@
 
 sf::VertexArray createQuarterArc(sf::Vector2f centerPosition, float radius, int quadrant, int Verticies, sf::Color color);
 
-sf::VertexArray createRoundedRect(sf::Vector2f Position, float Length, float Heigth, float LineThickness, float cornerRadius, sf::Color color);
+sf::VertexArray createRoundedRect(sf::Vector2f Position, float Length, float Heigth, float cornerRadius, sf::Color color);
+
+sf::VertexArray createRoundedRectBorder(sf::Vector2f Position, float Length, float Heigth, float CornerRadius, float LineThickness, sf::Color Color);
