@@ -47,7 +47,7 @@ public:
 		promptWindow.autoWindowSpacing();
 	}
 
-	ProgramModeID handleEvent(const sf::Event& event) override {
+	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
 		// handle events specific to simulation setup mode
 		return ProgramModeID::NONE;
 	}
@@ -64,3 +64,4 @@ public:
 		window.display();
 	}
 };
+

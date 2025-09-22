@@ -12,7 +12,7 @@ public:
 		simInitialized = false;
 	}
 
-	ProgramModeID handleEvent(const sf::Event& event) override {
+	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
 		// handle events specific to display test mode
 		return ProgramModeID::NONE;
 	}

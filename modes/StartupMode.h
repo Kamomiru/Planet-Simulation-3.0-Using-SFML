@@ -61,9 +61,9 @@ public:
 		std::any_cast<sf::Text&>(startText).setOrigin({ startTextBounds.size.x / 2.0f, startTextBounds.size.y / 2.0f });
 	}
 
-	ProgramModeID handleEvent(const sf::Event& event) override {
+	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
 		// handle events specific to startup mode
-		if (event.getIf<sf::Event::KeyPressed>() && event.getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Space) {
+		if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Space) {
 			std::cout << "Space!\n";
 			return ProgramModeID::SimulationSetup;
 		}

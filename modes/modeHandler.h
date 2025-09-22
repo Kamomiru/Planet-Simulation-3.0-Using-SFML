@@ -3,6 +3,7 @@
 #include "DisplayTestMode.h"
 #include "SimulationTestMode.h"
 #include "SimulationSetupMode.h"
+#include <optional>
 
 class ModeHandler {
 private:
@@ -42,9 +43,8 @@ public:
 	}
 
 	//Handle events accoting to currentMode
-	void handleEvent(const sf::Event& event) {
-		ProgramModeID changeMode;
-		changeMode = currentMode->handleEvent(event);
+	void handleEvent(const std::optional<sf::Event> eventPtr) {
+		ProgramModeID changeMode = currentMode->handleEvent(eventPtr); //Is of type ProgramModeID so the Modes can return another mode ID they would like to change to.
 		
 		this->setMode(changeMode); //Change mode if necessary
 	}

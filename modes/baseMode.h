@@ -16,7 +16,7 @@ enum class ProgramModeID {
 class BaseMode {
 public:
 
-	virtual ProgramModeID handleEvent(const sf::Event& event) = 0;
+	virtual ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) = 0;
 	virtual void update() = 0;
 	virtual void render(sf::RenderWindow& window) = 0;
 	virtual ~BaseMode() = default;

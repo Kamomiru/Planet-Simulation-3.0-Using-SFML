@@ -6,17 +6,20 @@
 
 static class DisplayTestMode : public BaseMode {
 private:
-	PromptWindow promptWindow;
+	InputWindow inputWindow;
 public:
 	DisplayTestMode() {
 		modeID = ProgramModeID::DisplayTest;
-		promptWindow = PromptWindow({ 100.0, 100.0f }, { 300.0, 200.0f }, std::vector<std::string>({ "SHello gg World!", "Hello g World!", "Das ist ein Prompt Window!", "Ich teste gerade die automatische Text Spacing Funktion!", "So far so good!"}));
-		promptWindow.autoWindowSpacing();
+		inputWindow = InputWindow({ 100.0, 100.0f }, { 300.0, 200.0f }, std::vector<std::string>({"Das ist ein Input Window!", "Bitte gib mir deinen Input:", "Über mir sollte jetzt dein Input zu sehen sein..."}), 2);
+		inputWindow.autoWindowSpacing();
 
 	}
 
-	ProgramModeID handleEvent(const sf::Event& event) override {
+	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
 		// handle events specific to display test mode
+		if (eventPtr->is<sf::Event::KeyPressed>()) {
+			inputWindow.handleInputEvent(eventPtr, true);
+		}
 		return ProgramModeID::NONE;
 	}
 
@@ -26,7 +29,7 @@ public:
 
 	void render(sf::RenderWindow& window) override {
 		window.clear(sf::Color::White);
-		promptWindow.draw(&window);
+		inputWindow.draw(&window);
 		window.display();
 	}
 };
