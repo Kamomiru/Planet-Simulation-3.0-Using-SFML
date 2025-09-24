@@ -14,11 +14,12 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(main
 src/main.cpp
-src/programWindow.h
-src/simulation.h
-src/simulationOLD.h
 src/constants.h
 src/programConfig.h
+src/programWindow.h
+src/promptWindow.h
+src/simulation.h
+src/vectorDrawer.h
 modes/baseMode.h
 modes/DisplayTestMode.h
 modes/modeHandler.h
@@ -29,6 +30,8 @@ helpers/vectorHelper.cpp
 helpers/vectorHelper.h
 helpers/customVertexArrays.cpp
 helpers/customVertexArrays.h
+helpers/stringHelper.cpp
+helpers/stringHelper.h
 sfml-entities/customSFMLEntities.h
 )
 
