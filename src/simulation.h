@@ -30,10 +30,7 @@ private:
 
 public:
 	//Default Constructor
-    CelestialObject() {
-        trajectory.setPrimitiveType(sf::PrimitiveType::LineStrip);
-        trajectory.append(vectorToVertex(position));
-    }
+    CelestialObject() = default;
 
     //Constructor
     CelestialObject(std::string n, double m, double r, std::vector<double> pos, std::vector<double> vel, sf::Color col) {

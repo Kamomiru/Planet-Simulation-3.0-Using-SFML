@@ -10,7 +10,7 @@ private:
 public:
 	DisplayTestMode() {
 		modeID = ProgramModeID::DisplayTest;
-		inputWindow = InputWindow({ 100.0, 100.0f }, { 300.0, 200.0f }, std::vector<std::string>({"Das ist ein Input Window!", "Bitte gib mir deinen Input:", "Über mir sollte jetzt dein Input zu sehen sein..."}), 2);
+		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 300.0, 200.0f }, std::vector<std::string>({"Das ist ein Input Window!", "Bitte gib mir deinen Input:", "Über mir sollte jetzt dein Input zu sehen sein..."}), 2);
 		inputWindow.autoWindowSpacing();
 
 	}

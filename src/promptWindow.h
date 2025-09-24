@@ -138,6 +138,20 @@ public:
 			renderWindow->draw(boundsRect);
 		}
 	}
+
+	void setTextLineString(std::string str, int lineNo) {
+		assert(!(lineNo < 0) && "Error: Given line number is below 0!");
+		assert((lineNo < textLinesVector.size()) && "Error: Given line number must be smaller than textLineVector.size()!");
+
+		textLinesVector[lineNo].setString(str);
+	}
+
+	void eraseTextLine(int lineNo) {
+		assert(!(lineNo < 0) && "Error: Given line number is below 0!");
+		assert((lineNo < textLinesVector.size()) && "Error: Given line number must be smaller than textLineVector.size()!");
+
+		textLinesVector.erase(textLinesVector.begin() + lineNo);
+	}
 };
 
 class InputWindow : public PromptWindow {
@@ -156,32 +170,39 @@ public:
 		inputLine = InputLine;
 		
 		//Create sf::Text Objects
-		for (int i = 0; i < TextLines.size(); i++) {
-			sf::Text textLine(*fontPtr);
-			textLine.setCharacterSize(fontSize);
-			textLine.setFillColor(fontColor);
-			textLine.setPosition(position);
-			if (i == inputLine) {
-				textLine.setString("");
-				textLinesVector.push_back(textLine);
-			}
-			textLine.setString(TextLines[i]);
-			textLinesVector.push_back(textLine);
+		for (std::string str : TextLines) {
+			sf::Text text(*fontPtr);
+			text.setCharacterSize(fontSize);
+			text.setFillColor(fontColor);
+			text.setPosition(position);
+			text.setString(str);
+			textLinesVector.push_back(text);
 		}
+		//Create sf::Text Object as placeholer for Input Line
+
+		sf::Text text(*fontPtr);
+		text.setCharacterSize(fontSize);
+		text.setFillColor(fontColor);
+		text.setPosition(position);
+		text.setString("");
+		textLinesVector.insert(textLinesVector.begin() + inputLine, text);
 
 		backgroundVertexArray = createRoundedRect(position, size.x, size.y, cornerRadius, windowBackgroundColor);
 		borderVertexArray = createRoundedRectBorder(position, size.x, size.y, cornerRadius, borderLineThickness, windowBorderColor);
 
+		std::cout << textLinesVector.size() << "\n";
 	}
 
-	void handleInputEvent(const std::optional<sf::Event> eventPtr, bool numberInputOnly = false) {
+	std::optional<std::string> handleInputEvent(const std::optional<sf::Event> eventPtr, bool numberInputOnly = false) {
 		assert(eventPtr->is<sf::Event::KeyPressed>() && "Error: Input Window got passed an event that is not KeyPressed! Only pass sf::Event::KeyPressed!");
 		
+		bool inputConfirmed = false;
 		int inputCode = (int)eventPtr->getIf<sf::Event::KeyPressed>()->code;
 		char inputChar = '?';
 
-		//std::cout << inputCode << "\n";
-		
+		std::cout << inputCode << "\n";
+
+		//convert inputCode to inputChar
 		if (!numberInputOnly) {
 			switch (inputCode) {
 			case 0:  inputChar = 'a'; break;
@@ -221,17 +242,16 @@ public:
 			case 34: inputChar = '8'; break;
 			case 35: inputChar = '9'; break;
 
-			case 39: inputChar = 'ü'; break;
+			case 48: inputChar = 'ü'; break;
 			case 51: inputChar = 'ä'; break;
 			case 57: inputChar = ' '; break;
 			case 54: inputChar = 'ö'; break;
 
-			case 59:
-				if (!inputString.empty()) { inputString.pop_back(); }; break;
 			default: inputChar = '?'; break; // fallback
 			}
 		}
-		else {
+		//Convert inputCode to inputChar -> numerical values only!
+		else { 
 			switch (inputCode) {
 			case 26: inputChar = '0'; break;
 			case 27: inputChar = '1'; break;
@@ -244,14 +264,21 @@ public:
 			case 34: inputChar = '8'; break;
 			case 35: inputChar = '9'; break;
 
-			case 59:
-				if (!inputString.empty()) { inputString.pop_back(); }; break;
-
 			default: inputChar = '?'; break; // fallback
 			}
 			
 		}
 
+		//Check for backspace
+		if (inputCode == 59 && !inputString.empty()) {
+			inputString.pop_back();
+		}
+		//Check for enter
+		else if (inputCode == 58 && !inputString.empty()) {
+			inputConfirmed = true;
+		}
+
+		//Add computed inputChar to inputString
 		if (inputChar != '?') {
 			inputString += inputChar;
 			if (numberInputOnly) {
@@ -259,8 +286,23 @@ public:
 				std::cout << numericalInput << "\n";
 			}
 		}
+
+		//Update inputLines string so it correctly shows what is being typed on screen
 		textLinesVector[inputLine].setString(inputString);
-		getNumericalInput();
+		
+		if (inputConfirmed) {
+			std::string output = inputString; //Copy initialization so when inputString is deleted/changed output stays the same
+
+			inputString = "";
+			textLinesVector[inputLine].setString(inputString);
+
+			return output;
+		}
+
+
+		//Return a pointer not holding a value
+		return std::nullopt;
+	
 	}
 
 	std::string getInput() {
@@ -268,8 +310,6 @@ public:
 	}
 
 	double getNumericalInput() {
-		assert(numericalInput != 0 && "Error: there is no numerical Input yet!");
-		
 		return numericalInput;
 		
 	}

@@ -9,7 +9,7 @@ int main()
 {   
 	initSFMLWindow();
 	
-	ModeHandler modeHandler(std::make_unique<DisplayTestMode>()); // Set Start Mode
+	ModeHandler modeHandler(std::make_unique<SimulationSetupMode>()); // Set Start Mode
 
 	Simulation sim; //Default Constructor
 
@@ -34,7 +34,7 @@ int main()
             }
 
 			//Switch Program Modes on S, D and F
-            /*if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::S) {
+            if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::S) {
 				modeHandler.setMode(std::make_unique<StartupMode>());
             }
 
@@ -44,7 +44,7 @@ int main()
 
             if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::F) {
                 modeHandler.setMode(std::make_unique<SimulationTestMode>());
-            }*/
+            }
 
 			modeHandler.handleEvent(eventPtr); //we can use the derefence operator * here to get the actual eventPtr. 
             //we could also use following syntax here:
