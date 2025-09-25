@@ -109,3 +109,16 @@ std::vector<double>& operator+=(std::vector<double>& a, const std::vector<double
 	}
 	return a;
 }
+
+//Check wether a string is in a vector
+bool isElementOfVector(std::string s, std::vector<std::string> vec) {
+	bool result = false;
+
+	for (int i = 0; i < vec.size(); i++) {
+		if (vec[i] == s) {
+			result = true;
+		}
+	}
+
+	return result;
+}

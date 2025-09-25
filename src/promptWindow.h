@@ -49,6 +49,7 @@ public:
 		borderVertexArray = createRoundedRectBorder(position, size.x, size.y, cornerRadius, borderLineThickness, windowBorderColor);
 	}
 
+	//Spaces text automatically within window borders
 	void autoTextSpacing() {
 		assert(!textLinesVector.empty() && "Error: textLinesVector is empty. Cannot automatically space text!");
 
@@ -77,6 +78,8 @@ public:
 		}
 	}
 
+	//Automatically spaces Text and Window.
+	//You can also opt by only spacing Text automatically with autoTextSpacing()!
 	void autoWindowSpacing() {
 		assert(!textLinesVector.empty() && "Error: textLinesVector is empty. Cannot automatically space Window!");
 		autoTextSpacing();
@@ -312,6 +315,12 @@ public:
 	double getNumericalInput() {
 		return numericalInput;
 		
+	}
+
+	void resetInput() {
+		inputString = "";
+		textLinesVector[inputLine].setString("");
+		std::cout << "Input String has been reset!" << "\n";
 	}
 
 };

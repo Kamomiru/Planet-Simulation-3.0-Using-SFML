@@ -33,18 +33,18 @@ int main()
                 window.close();
             }
 
-			//Switch Program Modes on S, D and F
-            if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::S) {
-				modeHandler.setMode(std::make_unique<StartupMode>());
-            }
+			////Switch Program Modes on S, D and F
+   //         if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::S) {
+			//	modeHandler.setMode(std::make_unique<StartupMode>());
+   //         }
 
-			if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::D) {
-                modeHandler.setMode(std::make_unique<DisplayTestMode>());
-			}
+			//if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::D) {
+   //             modeHandler.setMode(std::make_unique<DisplayTestMode>());
+			//}
 
-            if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::F) {
-                modeHandler.setMode(std::make_unique<SimulationTestMode>());
-            }
+   //         if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::F) {
+   //             modeHandler.setMode(std::make_unique<SimulationTestMode>());
+   //         }
 
 			modeHandler.handleEvent(eventPtr); //we can use the derefence operator * here to get the actual eventPtr. 
             //we could also use following syntax here:

@@ -14,6 +14,10 @@ private:
 	std::string name = "default";
     sf::CircleShape shape;
 	sf::Color color = sf::Color::White;
+    int ptCount = 60;
+
+    //used for simulation Setup mode
+    sf::Vector2f startingVelocity;
 
 	//Simulation Relevant Attributes
     double mass = -1;
@@ -40,11 +44,14 @@ public:
         position = pos;
         velocity = vel;
 
+        startingVelocity = { (float)pos[0], (float)pos[1] };
+
         //Apply Attributes to sfml-object shape
         shape.setRadius(radius);
         shape.setOrigin({ static_cast<float>(radius),static_cast<float>(radius) });
         shape.setPosition(vectorToSfVector(position));
         shape.setFillColor(col);
+        shape.setPointCount(ptCount);
 
         //Setup trajectory VertexArray
         trajectory.setPrimitiveType(sf::PrimitiveType::LineStrip);
@@ -93,6 +100,7 @@ public:
             assert(obj.objectSetupComplete == false && "Error: Object is already Built/Setup!");
 			assert(obj.velocity.empty() && "Error: Velocity has alrady been set!");
             obj.velocity = vel;
+            obj.startingVelocity = { (float)vel[0], (float)vel[1] };
         }
         
         static void finalizeSetup(CelestialObject& obj) {
@@ -105,6 +113,7 @@ public:
             //Setup trajectory VertexArray
             obj.trajectory.append(vectorToVertex(obj.position));
 			obj.startingKineticEnergy = obj.calcStartingKineticEnergy();
+            obj.shape.setPointCount(obj.ptCount);
 			
             obj.objectSetupComplete = true;
         }
@@ -144,9 +153,19 @@ public:
         return position;
     }
 
+    sf::Vector2f getPositionSf() {
+        sf::Vector2f pos = { (float)position[0], (float)position[1] };
+        return pos;
+    }
+
     //Get CelestialObject Velocity
     std::vector<double> getVelocity() {
-        return velocity;
+        assert(false && "Error: CelestialObject.getVelocity() needs yet to be implemented!");
+        return std::vector<double>({ 0.0,0.0 });
+    }
+
+    sf::Vector2f getStartingVelocity() {
+        return startingVelocity;
     }
 
     double getStartingKineticEnergy() {
@@ -241,6 +260,14 @@ public:
             drawables.push_back(celestialObjectContainer[i].getTrajectoryDrawable());
         }
         return drawables;
+    }
+
+    std::vector<std::string> getObjectNames() {
+        std::vector<std::string> names;
+        for (CelestialObject obj : celestialObjectContainer) {
+            names.push_back(obj.getName());
+        }
+        return names;
     }
     
 

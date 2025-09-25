@@ -29,6 +29,8 @@ std::vector<double> operator-(const std::vector<double>& a, const std::vector<do
 
 std::vector<double>& operator+=(std::vector<double>& a, const std::vector<double>& b);
 
+bool isElementOfVector(std::string s, std::vector<std::string> vec);
+
 //creates all possible pair combination of objects in a vector
 template <typename T> //Sets function up so that the output is a vector that holds Object pairs of a certain type and gets a vector with Objects of that type.
 std::vector<pairContainer<T*>> getPairs(std::vector<T*> inputVector) {
