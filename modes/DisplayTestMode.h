@@ -7,11 +7,19 @@
 static class DisplayTestMode : public BaseMode {
 private:
 	InputWindow inputWindow;
+	sf::CircleShape shape;
 public:
 	DisplayTestMode() {
 		modeID = ProgramModeID::DisplayTest;
 		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 300.0, 200.0f }, std::vector<std::string>({"Das ist ein Input Window!", "Bitte gib mir deinen Input:", "Über mir sollte jetzt dein Input zu sehen sein..."}), 2);
 		inputWindow.autoWindowSpacing();
+
+		shape = sf::CircleShape(100, 60);
+		shape.setFillColor(sf::Color::Black);
+		shape.setPosition({ 600, 600 });
+
+		enableViewMovement = true;
+		enableViewZoom = true;
 
 	}
 
@@ -29,7 +37,11 @@ public:
 
 	void render(sf::RenderWindow& window) override {
 		window.clear(sf::Color::White);
+
+		window.setView(guiView);
 		inputWindow.draw(&window);
+		window.setView(currentView);
+		window.draw(shape);
 		window.display();
 	}
 };

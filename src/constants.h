@@ -1,8 +1,8 @@
 #pragma once
-//Scale factor
-constexpr double scale{ 10e-6 }; //With factor 10e-6, 1000000m --> 1 unit in simulation = 1px
 
 namespace constants {
+	//Scale factor
+	constexpr double scale{ 10e-6 }; //With factor 10e-6, 1000000m --> 1 unit in simulation = 1px
 
 	constexpr double gravConstant{ 6.6743e-11 * scale }; //Gravitational Constant in m³/kg/s²
 

@@ -4,28 +4,24 @@
 #include "programConfig.h"
 
 inline sf::VideoMode desktop;
-inline sf::View view;
-inline sf::View viewGui;
+inline sf::View currentView;
+inline sf::View guiView;
 inline sf::RenderWindow window;
 inline sf::Vector2f windowCenter;
 inline sf::Vector2f windowSize;
-
-//Setting up Variables for View Movement
-inline bool mouseDragged = false;
-inline sf::Vector2f lastMousePos;
-inline sf::Vector2f currentMousePos;
 
 inline void initSFMLWindow() {
 	//setup MSAA --> smoother Graphics at the cost of performance
 	sf::ContextSettings settings;
 	settings.antiAliasingLevel = conf::graphics::antialiasingLevel;
 
-	//Setup Standard View
-	view = sf::View({ 860.f, 540.f }, { 1920.0f, 1080.0f });
-
-	//Setup User Interface View
 	desktop = sf::VideoMode::getDesktopMode();
-	viewGui = sf::View((sf::FloatRect({ 0.0f, 0.0f }, static_cast<sf::Vector2f>(desktop.size))));
+
+	//Setup User Interface View -> the view the GUI is drawn in. So everything that stayes on a fixed screen position
+	guiView = sf::View((sf::FloatRect({ 0.0f, 0.0f }, static_cast<sf::Vector2f>(desktop.size))));
+	
+	//Setup current View -> the view the simulation and any objects that are supposed to be moved are being drawn in
+	currentView = sf::View((sf::FloatRect({ 0.0f, 0.0f }, static_cast<sf::Vector2f>(desktop.size))));
 
 	//initializing window object
 	window = sf::RenderWindow(desktop, "PlanetSimulation", sf::State::Windowed, settings);

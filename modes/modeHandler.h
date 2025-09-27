@@ -43,7 +43,12 @@ public:
 	}
 
 	//Handle events accoting to currentMode
+	//We can also add code here that every mode has to handle. for example Window Movement
 	void handleEvent(const std::optional<sf::Event> eventPtr) {
+
+		currentMode->updateView(eventPtr); // if you wish to enable this you have to set enableViewMovement / enableViewZoom to true in that specific Mode! otherwise this fuction does nothing!
+		
+
 		ProgramModeID changeMode = currentMode->handleEvent(eventPtr); //Is of type ProgramModeID so the Modes can return another mode ID they would like to change to.
 		
 		this->setMode(changeMode); //Change mode if necessary

@@ -7,6 +7,8 @@
 #include "../src/simulation.h"
 #include "../src/vectorDrawer.h"
 #include <any>
+#include <sstream> // for std::ostringstream
+#include <iomanip> // for std::fixed and std::setprecision
 
 enum class SetupState {
 	ObjectName,
@@ -24,7 +26,6 @@ private:
 	SetupState setupState;
 
 	//UI Windows
-	PromptWindow promptWindow;
 	InputWindow inputWindow;
 	PromptWindow errorWindow;
 
@@ -40,6 +41,10 @@ private:
 	//for SetupState::ObjectName
 	bool drawErrorWindow = false;
 
+	//for SetupState::ObjectRadius
+	bool drawDensityIndicator = false;
+	std::optional<sf::Text> densityIndicator;
+
 	//for SetupState::ObjectVeclocity
 	bool drawVelocityVector = false;
 	sf::Vector2f distanceVector;
@@ -52,14 +57,13 @@ public:
 		modeID = ProgramModeID::SimulationSetup;
 		setupState = SetupState::ObjectName;
 
-		//UI Windows
-		promptWindow = PromptWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 500.0f, 200.0f }, { "The Simulation Setup Mode is under construction!"});
-		promptWindow.autoWindowSpacing();
+		enableViewMovement = true;
 
-		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin + 100 }, { 0,0 }, { "Please enter the Planets Name:" }, 1);
+		//UI Windows
+		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 0,0 }, { "Please enter the Planets Name:" }, 1);
 		inputWindow.autoWindowSpacing();
 
-		errorWindow = PromptWindow({ conf::ui::generalSideMargin + 420, conf::ui::generalSideMargin + 100 }, { 0,0 }, { "Please enter another Name!", "<- That name was already taken..."});
+		errorWindow = PromptWindow({ conf::ui::generalSideMargin + 420, conf::ui::generalSideMargin }, { 0,0 }, { "Please enter another Name!", "<- That name was already taken..."});
 		errorWindow.autoWindowSpacing();
 
 		//celestialObject placeholder
@@ -69,11 +73,15 @@ public:
 		setupObjShape.setFillColor(sf::Color::Black);
 		setupObjShape.setPointCount(60);
 
+		//for SetupState::ObjectRadius
+		densityIndicator = sf::Text(*conf::font::CascadiaRegularPtr);
+		densityIndicator->setCharacterSize(18);
+		densityIndicator->setFillColor(sf::Color::Black);
 		
 	}
 
 	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
-		// handle events specific to simulation setup mode
+		
 
 		//handle events according to setup state
 		switch (setupState) {
@@ -141,6 +149,8 @@ public:
 
 				//advance setupState to ObjectRadius
 				setupState = SetupState::ObjectRadius;
+				//start drawing densityIndicator
+				drawDensityIndicator = true;
 			}
 
 
@@ -148,6 +158,7 @@ public:
 
 		case(SetupState::ObjectRadius):
 			if (eventPtr->is<sf::Event::MouseMoved>()) { //This if Statement is only here to avoid C2360 initialization of ... is skipped by 'case' label. To improove readability and decrease cluttering elsewhere. also simplifies the code
+				
 				//calculate distanceVector between mouse and current setup objects position
 				sf::Vector2f mousePos = { (float)eventPtr->getIf<sf::Event::MouseMoved>()->position.x, (float)eventPtr->getIf<sf::Event::MouseMoved>()->position.y };
 				sf::Vector2f setupObjPos = setupObjShape.getPosition();
@@ -158,6 +169,15 @@ public:
 				setupObjShape.setRadius(setupObjRadius);
 				setupObjShape.setOrigin({ setupObjRadius, setupObjRadius });
 
+				//Handle density indicator
+				float pi = 3.14159265359;
+				float density = setupObj.getMass() / (4.0 / 3.0 * pi * std::pow(setupObjRadius / constants::scale, 3.0f)) / 1000.0f;
+				std::cout << density << "\n";
+				std::ostringstream oss;
+				oss << std::setprecision(2) << std::fixed << density << " g/cm³";
+
+				densityIndicator->setString(oss.str());
+				densityIndicator->setPosition(mousePos + sf::Vector2f(distanceVector.x * 0.5, distanceVector.y * 0.5));
 			}
 			
 			if (eventPtr->is<sf::Event::MouseButtonPressed>()) {
@@ -166,6 +186,12 @@ public:
 
 				//advance setupState to ObjectVelocity
 				setupState = SetupState::ObjectVelocity;
+				//stop drawing densityIndicator
+				drawDensityIndicator = false;
+
+				//Change inputWindow text
+				inputWindow.setTextLineString("Please choose your planets starting Velocity:", 0);
+				inputWindow.autoWindowSpacing();
 			}
 
 			break;
@@ -229,10 +255,16 @@ public:
 		window.clear(sf::Color::White);
 
 		//Draw UI Windows
-		promptWindow.draw(&window);
+		//window.setView(guiView);
 		inputWindow.draw(&window);
 		if (drawErrorWindow) {
 			errorWindow.draw(&window);
+		}
+
+		//Draw other Objects
+		/*window.setView(currentView);*/
+		if (drawDensityIndicator) {
+			window.draw(*densityIndicator);
 		}
 
 		//draw all CelestialObjects that have been finished the setup process
