@@ -128,7 +128,10 @@ public:
 
     void logCurrentPosition() {
         previousPositions.push_back(position);
-        trajectory.append(vectorToVertex(position));
+        sf::Vertex vertex;
+        vertex.position = vectorToSfVector(position);
+        vertex.color = sf::Color::Black;
+        trajectory.append(vertex);
     }
 
     void updatePosition(std::vector<double> newPos) {
@@ -160,8 +163,7 @@ public:
 
     //Get CelestialObject Velocity
     std::vector<double> getVelocity() {
-        assert(false && "Error: CelestialObject.getVelocity() needs yet to be implemented!");
-        return std::vector<double>({ 0.0,0.0 });
+        return velocity;
     }
 
     sf::Vector2f getStartingVelocity() {

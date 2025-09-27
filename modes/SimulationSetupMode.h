@@ -18,6 +18,7 @@ enum class SetupState {
 	ObjectVelocity,
 	ObjectColor,
 	ObjectFinalization,
+	ContinueRequest,
 	Idle
 };
 
@@ -125,7 +126,6 @@ public:
 
 					//Change inputWindow text and advance setupState to ObjectPosition
 					inputWindow.setTextLineString("Please position the Object:", 0);
-					inputWindow.autoWindowSpacing();
 					setupState = SetupState::ObjectPosition;
 				}
 			}
@@ -144,8 +144,8 @@ public:
 				drawSetupObj = true;
 
 				//Change inputWindow text
-				inputWindow.setTextLineString("Please choose your planets Radius:", 0);
-				inputWindow.autoWindowSpacing();
+				inputWindow.setTextLineString("Please choose your objects", 0);
+				inputWindow.setTextLineString("Radius:", 1);
 
 				//advance setupState to ObjectRadius
 				setupState = SetupState::ObjectRadius;
@@ -190,8 +190,9 @@ public:
 				drawDensityIndicator = false;
 
 				//Change inputWindow text
-				inputWindow.setTextLineString("Please choose your planets starting Velocity:", 0);
-				inputWindow.autoWindowSpacing();
+				inputWindow.setTextLineString("Please choose your objects", 0);
+				inputWindow.setTextLineString("starting velocity:", 1);
+
 			}
 
 			break;
@@ -234,9 +235,34 @@ public:
 
 			setupObj = CelestialObject();
 
-			inputWindow.setTextLineString("Please enter the Planets Name : ", 0);
+			inputWindow.setTextLineString("Would you like to add", 0);
+			inputWindow.setTextLineString("another object? [Y/N]", 1);
 
-			setupState = SetupState::ObjectName;
+			setupState = SetupState::ContinueRequest;
+			
+			
+				
+			
+			break;
+
+		case(SetupState::ContinueRequest):
+
+			if (eventPtr->is<sf::Event::KeyPressed>()) {
+				if (eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Y) {
+					inputWindow.setTextLineString("Please enter the Planets Name:", 0);
+					inputWindow.setTextLineString("", 1);
+					setupState = SetupState::ObjectName;
+				}
+				
+				if (eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::N) {
+					//TODO: Eventually implement exception for only one initialized CelestialObject
+					Simulation::Builder::finalizeSetup(simulation);
+					SimulationTestMode::initializeSimulation(simulation);
+					return ProgramModeID::SimulationTest;
+				}
+			}
+			
+
 			break;
 
 		case(SetupState::Idle):

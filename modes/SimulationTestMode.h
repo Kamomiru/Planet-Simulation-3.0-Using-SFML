@@ -1,15 +1,20 @@
 #pragma once
 #include "baseMode.h"
 #include "../src/simulation.h"
+#include "programWindow.h"
 
 static class SimulationTestMode : public BaseMode {
 private:
 	inline static Simulation sim;
 	inline static bool simInitialized;
+
 public:
+
 	SimulationTestMode() {
 		modeID = ProgramModeID::SimulationTest;
 		simInitialized = false;
+		enableViewMovement = true;
+		enableViewZoom = true;
 	}
 
 	ProgramModeID handleEvent(const std::optional<sf::Event> eventPtr) override {
@@ -23,7 +28,8 @@ public:
 	}
 
 	void render(sf::RenderWindow& window) override {
-		window.clear(sf::Color::Black);
+		window.clear(sf::Color::White);
+		window.setView(currentView);
 		std::vector<sf::CircleShape> drawableObjects = sim.getObjectDrawables();
 		std::vector<sf::VertexArray> drawableTrajectories = sim.getTrajectoryDrawables();
 		for (const sf::Drawable& drawable : drawableObjects) {
