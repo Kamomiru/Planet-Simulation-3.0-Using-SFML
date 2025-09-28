@@ -3,6 +3,7 @@
 #include "../helpers/customVertexArrays.h"
 #include "../helpers/stringHelper.h"
 #include "../src/programConfig.h"
+#include "constants.h"
 #include <string>
 #include <vector>
 #include <any>
@@ -326,3 +327,154 @@ public:
 };
 
 
+
+class ObjectTableWindow {
+protected:
+	sf::Vector2f position;
+
+	//Window Graphics variables
+	sf::Vector2f size;
+	float cornerRadius = 10.0f;
+	float borderLineThickness = 5.0f;
+	float padding = 16.0f;
+	sf::Vector2f paddingVector{ padding,padding };
+	sf::Color windowBackgroundColor = conf::ui::darkGrey;
+	sf::Color windowBorderColor = conf::ui::darkDarkGrey;
+	sf::VertexArray backgroundVertexArray;
+	sf::VertexArray borderVertexArray;
+
+	//Text variables
+	//std::vector<sf::Text> textLinesVector;
+	std::vector<std::vector<sf::Text>> sfTextContainer; //Row x Column
+	int fontSize = 14;
+	int lineDistance = 8.0f;
+	int columnDistance = 8.0f;
+	int lineNo = 0;
+	int lineLength = 100;
+	sf::Color fontColor = sf::Color::White;
+	sf::Font* fontPtr = conf::font::CascadiaRegularPtr.get();
+	sf::Vector2f textSizeLineOne;
+
+	std::vector<std::string> names;
+	std::vector<float> masses;
+	std::vector<float> radii;
+	std::vector<float> densities;
+
+public:
+	ObjectTableWindow() = default;
+
+	ObjectTableWindow(sf::Vector2f Position, sf::Vector2f Size) :
+		position(Position), size(Size) {
+
+		backgroundVertexArray = createRoundedRect(position, size.x, size.y, cornerRadius, windowBackgroundColor);
+		borderVertexArray = createRoundedRectBorder(position, size.x, size.y, cornerRadius, borderLineThickness, windowBorderColor);
+
+		std::vector<sf::Text> row;
+		int columnNo = 0;
+
+		sf::Text nameTxt(*fontPtr, "Name", fontSize);
+		nameTxt.setFillColor(fontColor);
+		nameTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
+		row.push_back(nameTxt);
+
+		columnNo++;
+
+		sf::Text massTxt(*fontPtr, "Mass", fontSize);
+		massTxt.setFillColor(fontColor);
+		massTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
+		row.push_back(massTxt);
+
+
+		columnNo++;
+
+		sf::Text radiusTxt(*fontPtr, "Radius", fontSize);
+		radiusTxt.setFillColor(fontColor);
+		radiusTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
+		row.push_back(radiusTxt);
+
+
+		columnNo++;
+
+		sf::Text densityText(*fontPtr, "Density", fontSize);
+		densityText.setFillColor(fontColor);
+		densityText.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
+		row.push_back(densityText);
+
+		sfTextContainer.push_back(row);
+		lineNo++;
+	}
+
+	void appendLine(std::string Name, float Mass, float Radius) {
+		std::vector<sf::Text> row;
+		int columnNo = 0;
+
+		
+
+		sf::Text nameTxt(*fontPtr);
+		nameTxt.setFillColor(fontColor);
+		nameTxt.setString(Name);
+		nameTxt.setCharacterSize(fontSize);
+		nameTxt.setPosition(position + paddingVector + sf::Vector2f{ 0.0f,(float)lineNo * (fontSize + lineDistance) });
+
+		row.push_back(nameTxt);
+		columnNo++;
+
+		sf::Text massTxt(*fontPtr);
+		massTxt.setFillColor(fontColor);
+		massTxt.setCharacterSize(fontSize);
+		massTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		std::ostringstream massString;
+		massString << std::scientific << std::setprecision(2) << Mass << " kg?";
+		massTxt.setString(massString.str());
+		
+		row.push_back(massTxt);
+		columnNo++;
+
+		sf::Text radiusTxt(*fontPtr);
+		radiusTxt.setFillColor(fontColor);
+		radiusTxt.setCharacterSize(fontSize);
+		radiusTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		std::ostringstream radiusString;
+		radiusString << std::scientific << std::setprecision(2) << Radius << " m?";
+		radiusTxt.setString(radiusString.str());
+
+		row.push_back(radiusTxt);
+		columnNo++;
+
+		float pi = 3.14159265359;
+		float density = Mass / (4.0 / 3.0 * pi * std::pow(Radius / constants::scale, 3.0f)) / 1000.0f; //in g/cm³
+
+		sf::Text densityTxt(*fontPtr);
+		densityTxt.setFillColor(fontColor);
+		densityTxt.setCharacterSize(fontSize);
+		densityTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		std::ostringstream densityString;
+		densityString << std::fixed << std::setprecision(2) << density << " g/cm³";
+		densityTxt.setString(densityString.str());
+		row.push_back(densityTxt);
+		
+
+		sfTextContainer.push_back(row);
+		lineNo++;
+
+		autoSetHeigth();
+
+	}
+
+	void draw(sf::RenderWindow* renderWindow, bool drawBoundaries = false) {
+		renderWindow->draw(backgroundVertexArray);
+		renderWindow->draw(borderVertexArray);
+		for (std::vector col : sfTextContainer) {
+			for (sf::Text text : col) {
+				renderWindow->draw(text);
+			}
+		}
+		
+	}
+
+	void autoSetHeigth() {
+		size.y = 2 * padding + lineNo * (fontSize + lineDistance);
+		backgroundVertexArray = createRoundedRect(position, size.x, size.y, cornerRadius, windowBackgroundColor);
+		borderVertexArray = createRoundedRectBorder(position, size.x, size.y, cornerRadius, borderLineThickness, windowBorderColor);
+	}
+};

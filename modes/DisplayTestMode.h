@@ -7,12 +7,18 @@
 static class DisplayTestMode : public BaseMode {
 private:
 	InputWindow inputWindow;
+	ObjectTableWindow tableWindow;
 	sf::CircleShape shape;
 public:
 	DisplayTestMode() {
 		modeID = ProgramModeID::DisplayTest;
 		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 300.0, 200.0f }, std::vector<std::string>({"Das ist ein Input Window!", "Bitte gib mir deinen Input:", "Über mir sollte jetzt dein Input zu sehen sein..."}), 2);
 		inputWindow.autoWindowSpacing();
+
+		tableWindow = ObjectTableWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin + 200 }, { 440.0, 800.0f });
+		tableWindow.appendLine("Erde", 100000, 10);
+		tableWindow.appendLine("Mond", 100000, 10);
+
 
 		shape = sf::CircleShape(100, 60);
 		shape.setFillColor(sf::Color::Black);
@@ -40,6 +46,7 @@ public:
 
 		window.setView(guiView);
 		inputWindow.draw(&window);
+		tableWindow.draw(&window);
 		window.setView(currentView);
 		window.draw(shape);
 		window.display();

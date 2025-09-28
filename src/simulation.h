@@ -151,6 +151,10 @@ public:
         return mass;
     }
 
+    double getRadius() {
+        return radius;
+    }
+
     //Get CelestialObject Position
     std::vector<double> getPosition() {
         return position;

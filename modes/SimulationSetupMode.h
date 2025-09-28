@@ -29,6 +29,7 @@ private:
 	//UI Windows
 	InputWindow inputWindow;
 	PromptWindow errorWindow;
+	ObjectTableWindow tableWindow;
 
 	//Simulation Specific Objects
 	Simulation simulation;
@@ -63,9 +64,11 @@ public:
 		//UI Windows
 		inputWindow = InputWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin }, { 0,0 }, { "Please enter the Planets Name:" }, 1);
 		inputWindow.autoWindowSpacing();
-
 		errorWindow = PromptWindow({ conf::ui::generalSideMargin + 420, conf::ui::generalSideMargin }, { 0,0 }, { "Please enter another Name!", "<- That name was already taken..."});
 		errorWindow.autoWindowSpacing();
+
+		tableWindow = ObjectTableWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin + 100 }, { 440.0, 800.0f });
+		tableWindow.autoSetHeigth();
 
 		//celestialObject placeholder
 		setupObjRadius = 10.0f;
@@ -229,6 +232,8 @@ public:
 			CelestialObject::Builder::finalizeSetup(setupObj);
 			Simulation::Builder::addCelestialObject(simulation, setupObj);
 			
+			tableWindow.appendLine(setupObj.getName(), setupObj.getMass(), setupObj.getRadius());
+
 			//reset to beginning
 			drawSetupObj = false;
 			drawVelocityVector = false;
@@ -283,6 +288,7 @@ public:
 		//Draw UI Windows
 		//window.setView(guiView);
 		inputWindow.draw(&window);
+		tableWindow.draw(&window);
 		if (drawErrorWindow) {
 			errorWindow.draw(&window);
 		}
