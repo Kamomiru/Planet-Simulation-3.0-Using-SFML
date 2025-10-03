@@ -16,8 +16,6 @@ public:
 		inputWindow.autoWindowSpacing();
 
 		tableWindow = ObjectTableWindow({ conf::ui::generalSideMargin, conf::ui::generalSideMargin + 200 }, { 440.0, 800.0f });
-		tableWindow.appendLine("Erde", 100000, 10);
-		tableWindow.appendLine("Mond", 100000, 10);
 
 
 		shape = sf::CircleShape(100, 60);

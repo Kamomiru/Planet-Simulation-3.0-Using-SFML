@@ -9,7 +9,7 @@ int main()
 {   
 	initSFMLWindow();
 	
-	ModeHandler modeHandler(std::make_unique<SimulationSetupMode>()); // Set Start Mode
+	ModeHandler modeHandler(std::make_unique<SimulationSetupModeSimplified>()); // Set Start Mode
 
 	Simulation sim; //Default Constructor
 

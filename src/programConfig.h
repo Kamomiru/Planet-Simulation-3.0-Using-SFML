@@ -35,6 +35,7 @@ namespace conf {
 
 		float generalSidePadding = 48.0f;
 		float generalSideMargin = 24.0f;
+		sf::Vector2f marginVector{ generalSideMargin, generalSideMargin };
 
 		uint16_t standardFontSizeMedium = 16;
 	}

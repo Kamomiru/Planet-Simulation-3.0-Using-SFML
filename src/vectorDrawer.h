@@ -45,7 +45,7 @@ inline void rotateAroundPoint(sf::VertexArray& vertexArrayToRotate, sf::Vector2f
 
 inline void drawVector(sf::Vector2f startPos, float length, float angleGrad, sf::RenderWindow* window) {
     float lineWidth = 3.0f;
-    sf::Color clr(sf::Color::Magenta);
+    sf::Color clr(sf::Color::Black);
 
     //Check for negative Length
     if (length < 0) {

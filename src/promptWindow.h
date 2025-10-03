@@ -3,6 +3,7 @@
 #include "../helpers/customVertexArrays.h"
 #include "../helpers/stringHelper.h"
 #include "../src/programConfig.h"
+#include "../src/PlanetEnum.h"
 #include "constants.h"
 #include <string>
 #include <vector>
@@ -25,7 +26,7 @@ protected:
 
 	//Text variables
 	std::vector<sf::Text> textLinesVector;
-	int fontSize = 18;
+	int fontSize = 14;
 	int lineDistance = 8.0f;
 	sf::Color fontColor = sf::Color::White;
 	sf::Font* fontPtr = conf::font::CascadiaRegularPtr.get();
@@ -60,6 +61,9 @@ public:
 		float fontVerticalOffset = 0;
 		switch(fontSize) {
 		case(18):
+			fontVerticalOffset = 4;
+			break;
+		case(14):
 			fontVerticalOffset = 4;
 			break;
 		default:
@@ -155,6 +159,13 @@ public:
 		assert((lineNo < textLinesVector.size()) && "Error: Given line number must be smaller than textLineVector.size()!");
 
 		textLinesVector.erase(textLinesVector.begin() + lineNo);
+	}
+
+	void setPosition(sf::Vector2f Position) {
+		position = Position;
+		backgroundVertexArray = createRoundedRect(position, size.x, size.y, cornerRadius, windowBackgroundColor);
+		borderVertexArray = createRoundedRectBorder(position, size.x, size.y, cornerRadius, borderLineThickness, windowBorderColor);
+		autoTextSpacing();
 	}
 };
 
@@ -358,7 +369,7 @@ protected:
 	std::vector<std::string> names;
 	std::vector<float> masses;
 	std::vector<float> radii;
-	std::vector<float> densities;
+	std::vector<float> velocities;
 
 public:
 	ObjectTableWindow() = default;
@@ -395,16 +406,16 @@ public:
 
 		columnNo++;
 
-		sf::Text densityText(*fontPtr, "Density", fontSize);
-		densityText.setFillColor(fontColor);
-		densityText.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
-		row.push_back(densityText);
+		sf::Text velocityText(*fontPtr, "Velocity", fontSize);
+		velocityText.setFillColor(fontColor);
+		velocityText.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,0.0f });
+		row.push_back(velocityText);
 
 		sfTextContainer.push_back(row);
 		lineNo++;
 	}
 
-	void appendLine(std::string Name, float Mass, float Radius) {
+	void appendLine(std::string Name, float Mass, float Radius, float Velocity) {
 		std::vector<sf::Text> row;
 		int columnNo = 0;
 
@@ -441,17 +452,15 @@ public:
 		row.push_back(radiusTxt);
 		columnNo++;
 
-		float pi = 3.14159265359;
-		float density = Mass / (4.0 / 3.0 * pi * std::pow(Radius / constants::scale, 3.0f)) / 1000.0f; //in g/cm³
+		sf::Text velocityTxt(*fontPtr);
+		velocityTxt.setFillColor(fontColor);
+		velocityTxt.setCharacterSize(fontSize);
+		velocityTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		std::ostringstream velocityString;
+		velocityString << std::scientific << std::setprecision(2) << Velocity << " u?";
+		velocityTxt.setString(velocityString.str());
 
-		sf::Text densityTxt(*fontPtr);
-		densityTxt.setFillColor(fontColor);
-		densityTxt.setCharacterSize(fontSize);
-		densityTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
-		std::ostringstream densityString;
-		densityString << std::fixed << std::setprecision(2) << density << " g/cm³";
-		densityTxt.setString(densityString.str());
-		row.push_back(densityTxt);
+		row.push_back(velocityTxt);
 		
 
 		sfTextContainer.push_back(row);
@@ -459,6 +468,159 @@ public:
 
 		autoSetHeigth();
 
+	}
+
+	void addLine() {
+		std::vector<sf::Text> row;
+
+		int columnNo = 0;
+
+		sf::Text nameTxt(*fontPtr);
+		nameTxt.setFillColor(fontColor);
+		nameTxt.setString("");
+		nameTxt.setCharacterSize(fontSize);
+		nameTxt.setPosition(position + paddingVector + sf::Vector2f{ 0.0f,(float)lineNo * (fontSize + lineDistance) });
+
+		row.push_back(nameTxt);
+		columnNo++;
+
+
+		sf::Text massTxt(*fontPtr);
+		massTxt.setFillColor(fontColor);
+		massTxt.setCharacterSize(fontSize);
+		massTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		massTxt.setString("");
+
+		row.push_back(massTxt);
+		columnNo++;
+
+
+		sf::Text radiusTxt(*fontPtr);
+		radiusTxt.setFillColor(fontColor);
+		radiusTxt.setCharacterSize(fontSize);
+		radiusTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		radiusTxt.setString("");
+
+		row.push_back(radiusTxt);
+		columnNo++;
+
+		sf::Text velocityTxt(*fontPtr);
+		velocityTxt.setFillColor(fontColor);
+		velocityTxt.setCharacterSize(fontSize);
+		velocityTxt.setPosition(position + paddingVector + sf::Vector2f{ (lineLength + columnDistance) * (float)columnNo,(float)lineNo * (fontSize + lineDistance) });
+		velocityTxt.setString("");
+
+		row.push_back(velocityTxt);
+
+
+		sfTextContainer.push_back(row);
+		lineNo++;
+
+		autoSetHeigth();
+	}
+
+	void setLineStrings(PlanetEnum planet, int line) {
+		assert(line > 0 && "Error: Can only set line strings of lines > 1!");
+		assert(line < sfTextContainer.size() && "Error: line is out of vector range of sfTextContainer!");
+
+		struct PlanetData {
+			std::string Name;
+			float Mass;
+			float Radius;
+			float Velocity;
+		};
+
+		PlanetData planetData;
+
+		switch (planet) {
+		case Earth:
+			planetData.Name = "Earth";
+			planetData.Mass = constants::earth::mass;
+			planetData.Radius = constants::earth::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Moon:
+			planetData.Name = "Moon";
+			planetData.Mass = constants::moon::mass;
+			planetData.Radius = constants::moon::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Mars:
+			planetData.Name = "Mars";
+			planetData.Mass = constants::mars::mass;
+			planetData.Radius = constants::mars::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Jupiter:
+			planetData.Name = "Jupiter";
+			planetData.Mass = constants::jupiter::mass;
+			planetData.Radius = constants::jupiter::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Saturn:
+			planetData.Name = "Saturn";
+			planetData.Mass = constants::saturn::mass;
+			planetData.Radius = constants::saturn::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Uranus:
+			planetData.Name = "Uranus";
+			planetData.Mass = constants::uranus::mass;
+			planetData.Radius = constants::uranus::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Mercury:
+			planetData.Name = "Mercury";
+			planetData.Mass = constants::mercury::mass;
+			planetData.Radius = constants::mercury::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Pluto:
+			planetData.Name = "Pluto";
+			planetData.Mass = constants::pluto::mass;
+			planetData.Radius = constants::pluto::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Venus:
+			planetData.Name = "Venus";
+			planetData.Mass = constants::venus::mass;
+			planetData.Radius = constants::venus::radius;
+			planetData.Velocity = 0;
+			break;
+
+		case Neptune:
+			planetData.Name = "Neptune";
+			planetData.Mass = constants::neptune::mass;
+			planetData.Radius = constants::neptune::radius;
+			planetData.Velocity = 0;
+			break;
+		}
+
+		sfTextContainer[line][0].setString(planetData.Name);
+		
+		std::ostringstream massString;
+		massString << std::scientific << std::setprecision(2) << planetData.Mass << " kg?";
+		sfTextContainer[line][1].setString(massString.str());
+
+		std::ostringstream radiusString;
+		radiusString << std::scientific << std::setprecision(2) << planetData.Radius << " m?";
+		sfTextContainer[line][2].setString(radiusString.str());
+
+		sfTextContainer[line][3].setString("tbd.");
+
+
+	}
+
+	void setString(std::string string, int line, int column) {
+		sfTextContainer[line][column].setString(string);
 	}
 
 	void draw(sf::RenderWindow* renderWindow, bool drawBoundaries = false) {

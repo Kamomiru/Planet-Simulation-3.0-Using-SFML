@@ -20,10 +20,11 @@ src/programWindow.h
 src/promptWindow.h
 src/simulation.h
 src/vectorDrawer.h
+src/PlanetEnum.h
 modes/baseMode.h
 modes/DisplayTestMode.h
 modes/modeHandler.h
-modes/SimulationSetupMode.h
+modes/SimulationSetupModeSimplified.h
 modes/SimulationTestMode.h
 modes/StartupMode.h
 helpers/vectorHelper.cpp

@@ -1,5 +1,5 @@
 #pragma once
-#include "programWindow.h"
+#include "../src/programWindow.h"
 
 enum class ProgramModeID {
 	NONE,
@@ -8,6 +8,7 @@ enum class ProgramModeID {
 	DisplayTest,
 	SimulationTest,
 	SimulationSetup,
+	SimulationSetupSimplified,
 	//Simulation,
 	//Settings
 };

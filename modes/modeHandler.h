@@ -2,7 +2,7 @@
 #include "StartupMode.h"
 #include "DisplayTestMode.h"
 #include "SimulationTestMode.h"
-#include "SimulationSetupMode.h"
+#include "SimulationSetupModeSimplified.h"
 #include <optional>
 
 class ModeHandler {
@@ -34,7 +34,7 @@ public:
 				setMode(std::make_unique<SimulationTestMode>());
 				break;
 			case ProgramModeID::SimulationSetup:
-				setMode(std::make_unique<SimulationSetupMode>());
+				setMode(std::make_unique<SimulationSetupModeSimplified>());
 				break;
 			default:
 				break;

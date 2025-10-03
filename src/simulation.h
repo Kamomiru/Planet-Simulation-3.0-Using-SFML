@@ -104,7 +104,7 @@ public:
         }
         
         static void finalizeSetup(CelestialObject& obj) {
-			assert(!obj.objectSetupComplete && "Error: Object setup is already complete!");
+			//assert(!obj.objectSetupComplete && "Error: Object setup is already complete!");
             assert(obj.name != "default" && "Error: Name was not set!");
             assert(obj.mass != -1 && "Error: Mass was not set!");
             assert(obj.radius != -1 && "Error: Radius was not set!");
@@ -121,7 +121,7 @@ public:
     };
 
     double calcStartingKineticEnergy() {
-		assert(startingKineticEnergy == 0 && "Error: StartingKineticEnergy has already been calculated!"); //Make sure this function is only called once!
+		//assert(startingKineticEnergy == 0 && "Error: StartingKineticEnergy has already been calculated!"); //Make sure this function is only called once!
 		startingKineticEnergy = 0.5l * mass * (velocity[0] * velocity[0] + velocity[1] * velocity[1]);
 		return startingKineticEnergy;
     }
@@ -195,6 +195,19 @@ public:
 	}
 
 #pragma endregion
+
+    void setPosition(std::vector<double> Position) {
+        position = Position;
+        shape.setPosition(vectorToSfVector(position));
+    }
+
+    void setVelocity(std::vector<double> Velocity) {
+        velocity = Velocity;
+    }
+
+    void setName(std::string str) {
+        name = str;
+    }
 
     //Overload == Operator
     bool operator==(const CelestialObject& otherCelestialObject) const {
