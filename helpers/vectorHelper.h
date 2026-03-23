@@ -14,6 +14,18 @@ template <typename T>
 struct  pairContainer {
 	T a;
 	T b;
+
+	double calcPrevPairDistance() {
+		std::vector<double> prevDistance = { b.getPrevPosition()[0] - a.getPrevPosition()[0] , b.getPrevPosition()[1] - a.getPrevPosition()[1] };
+		double distance = std::sqrt(prevDistance[0] * prevDistance[0] + prevDistance[1] * prevDistance[1]);
+		return distance;
+	}
+
+	double calcPairDistance() {
+		std::vector<double> Distance = { b.getPosition()[0] - a.getPosition()[0], b.getPosition()[1] - a.getPosition()[1] };
+		double distance = std::sqrt(Distance[0] * Distance[0] + Distance[1] * Distance[1]);
+		return distance;
+	}
 };
 
 double vectorLength(std::vector<double> vector);

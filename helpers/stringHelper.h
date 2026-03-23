@@ -1,10 +1,11 @@
-#pragma once
+﻿#pragma once
 #include <sstream>
 #include <string>
 #include <iomanip>
 #include <vector>
 
 std::string doubleToStringScientific(double value, int precision);
+std::string removeTrailingZeros(const std::string& input);
 char pop_front(std::string& s);
 void eraseLeadingWhitespace(std::string& s);
 void eraseTrailingWhitespace(std::string& s);

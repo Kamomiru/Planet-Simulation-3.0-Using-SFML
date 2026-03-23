@@ -1,4 +1,4 @@
-#include "stringHelper.h"
+﻿#include "stringHelper.h"
 
 
 //Converts double to a String in scientific format
@@ -6,6 +6,15 @@ std::string doubleToStringScientific(double value, int precision) {
 	std::ostringstream oss;
 	oss << std::scientific << std::setprecision(precision) << value;
 	return oss.str();
+}
+
+std::string removeTrailingZeros(const std::string& input) {
+	std::string result = input;
+
+	// Remove trailing zeros
+	result.erase(result.find_last_not_of('0') + 1); //.find_last_not_off('0') finds last char that is not a '0' and erase() removes all letters from a given int.
+
+	return result;
 }
 
 char pop_front(std::string& s) {

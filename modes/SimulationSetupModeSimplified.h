@@ -67,7 +67,7 @@ private:
 
 public:
 	SimulationSetupModeSimplified() {
-		modeID = ProgramModeID::SimulationSetup;
+		modeID = ProgramModeID::SimulationSetupSimplified;
 		setupState = SetupState::SelectObject;
 
 		enableViewMovement = false;

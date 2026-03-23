@@ -33,7 +33,7 @@ public:
 			case ProgramModeID::SimulationTest:
 				setMode(std::make_unique<SimulationTestMode>());
 				break;
-			case ProgramModeID::SimulationSetup:
+			case ProgramModeID::SimulationSetupSimplified:
 				setMode(std::make_unique<SimulationSetupModeSimplified>());
 				break;
 			default:

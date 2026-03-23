@@ -65,7 +65,7 @@ public:
 		// handle events specific to startup mode
 		if (eventPtr->getIf<sf::Event::KeyPressed>() && eventPtr->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Space) {
 			std::cout << "Space!\n";
-			return ProgramModeID::SimulationSetup;
+			return ProgramModeID::SimulationSetupSimplified;
 		}
 
 	}

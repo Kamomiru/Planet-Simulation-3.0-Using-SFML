@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 
 #include <SFML/Graphics.hpp>
@@ -140,6 +140,27 @@ public:
         shape.setPosition(vectorToSfVector(newPos));
 	}
 
+    //calculates Velocity of last time step
+    std::vector<double> calcPrevVelocityVerlet(float dt) {
+        std::vector<double> prevVelocity = { 0.0f, 0.0f };
+        std::vector<double> currentPos = previousPositions[previousPositions.size() - 1];
+        std::vector<double> prevprevPos = previousPositions[previousPositions.size() - 3];
+
+        prevVelocity = { (currentPos[0] - prevprevPos[0]) / 2.0 * dt, (currentPos[1] - prevprevPos[1]) / 2.0 * dt };
+
+        return prevVelocity;
+
+        
+    }
+
+    //calculates KineticEnergy of last time step
+    double calcPrevKineticEnergy(float dt) {
+        std::vector<double> vel = this->calcPrevVelocityVerlet(dt);
+        double kineticEnergy = 0.5f * mass * (vel[0] * vel[0] + vel[1] * vel[1]);
+
+        return kineticEnergy;
+    }
+
 #pragma region Get Functions
     //Get CelestialObject name
     std::string getName() const {
@@ -194,6 +215,11 @@ public:
         return objectSetupComplete;
 	}
 
+    std::vector<double> getPrevPosition() {
+        int prevPosIndices = previousPositions.size() - 1;
+        return previousPositions[prevPosIndices];
+    }
+
 #pragma endregion
 
     void setPosition(std::vector<double> Position) {
@@ -237,6 +263,11 @@ public:
         //TODO: Implement Energy calculation for Simulation analysis. startingSystemEnergy = calcTotalKineticEnergy() - calcTotalPotentialEnergy();
         steps = 0;
 
+        startingSystemEnergy = calcTotalPotentialEnergy() + calcTotalKineticEnergy();
+        for (CelestialObject obj : celestialObjectContainer) {
+            startingSystemEnergy += obj.calcStartingKineticEnergy();
+        }
+
 		simulationSetupComplete = true;
     }
 
@@ -258,9 +289,14 @@ public:
         }
 
         static void finalizeSetup(Simulation& sim) {
-            //TODO: Implement Energy calculation for Simulation analysis
             assert(!sim.celestialObjectContainer.empty() && "Error: celestialObjectContainer has to have at least one Celestial Object!");
-			sim.simulationSetupComplete = true;
+            
+            sim.startingSystemEnergy = sim.calcTotalPotentialEnergy();
+            for (CelestialObject obj : sim.celestialObjectContainer) {
+                sim.startingSystemEnergy += obj.calcStartingKineticEnergy();
+            }
+			
+            sim.simulationSetupComplete = true;
         }
     };
 
@@ -309,7 +345,7 @@ public:
             }
         }
 
-		std::cout << "Total Accel Vector for " << obj.getName() << ": (" << totalAccelVector[0] << " , " << totalAccelVector[1] << ")\n";
+		//std::cout << "Total Accel Vector for " << obj.getName() << ": (" << totalAccelVector[0] << " , " << totalAccelVector[1] << ")\n";
 		return totalAccelVector;
     }
 
@@ -343,6 +379,8 @@ public:
 
 		std::vector<std::vector<double>> nextPositions(celestialObjectContainer.size(), std::vector<double>(2, 0.0)); //2D vector to hold next positions of all CelestialObjects
 
+        celestialObjectPairContainer = getPairs(Simulation::celestialObjectContainer); //needed so the celestialObjectPairContainer gets updated too. Probably hugely inefficient but this was made to debug the program. So for now its okay!
+
         for (int i{ 0 }; i < celestialObjectContainer.size(); i++) {
             std::vector<double> nextPos;
 			CelestialObject& obj = celestialObjectContainer[i];
@@ -354,41 +392,82 @@ public:
 			obj.logCurrentPosition(); //Log current position before updating it
 			nextPositions[i] = nextPos;
         }
-		std::cout << celestialObjectContainer.size() << std::endl;
+        
         for (int i_{ 0 }; i_ < celestialObjectContainer.size(); i_++) { //
             CelestialObject& obj = celestialObjectContainer[i_];
             obj.updatePosition(nextPositions[i_]);
         }
         steps++;
     }
+
 #pragma endregion
 
-#pragma region EnergyFunctions
-    //Calculate total Kinetic Energy of all CelestialObjects/System
-    double calcTotalKineticEnergy() {
-		//TODO: Implement Kinetic Energy Calculation for Verlet integration
-    }
-
-    //Calculate Potential Energy between two CelestialObjects
-    double calcPotentialEnergy(pairContainer<CelestialObject> CelestialObjectPair) {
-		//TODO: Implement Potential Energy Calculation for Verlet integration
-    }
-
-    //Calculate Total Potential Energy of CelestialObjectary System
+#pragma region EnergyCalculation Functions
+    //Calculate Potential Energy of Simulation System
     double calcTotalPotentialEnergy() {
-		//TODO: Implement Total Potential Energy Calculation for Verlet integration
+        double totalPotentialEnergy = 0.0;
+        for (pairContainer<CelestialObject> pair : celestialObjectPairContainer) {
+            totalPotentialEnergy += -constants::gravConstant * pair.a.getMass() * pair.b.getMass() / pair.calcPairDistance();
+        }
+        return totalPotentialEnergy;
+    }
+
+    //Calculate Potential Energy of Simulation System
+    double calcTotalKineticEnergy() {
+        double totalKineticEnergy = 0.0;
+        for (CelestialObject planet : celestialObjectContainer) {
+            totalKineticEnergy += planet.calcStartingKineticEnergy();
+        }
+        return totalKineticEnergy;
+    }
+
+    //Calculate Kinetic Energy of all CelestialObjects of the last time step
+    double calcPrevTotalKineticEnergy() {
+        double totalKineticEnergy = 0.0;
+        for (CelestialObject obj : celestialObjectContainer) {
+            totalKineticEnergy += obj.calcPrevKineticEnergy(dt);
+        }
+        return totalKineticEnergy;
+    }
+
+    //Calculate previous Potential Energy between two CelestialObjects
+    double calcPrevPotentialEnergy(pairContainer<CelestialObject> CelestialObjectPair) {
+        double prevPotEnergy = - constants::gravConstant * CelestialObjectPair.a.getMass() * CelestialObjectPair.b.getMass() / CelestialObjectPair.calcPrevPairDistance();
+        return prevPotEnergy;
+    }
+
+    //Calculate Total Potential Energy of Simulation System
+    double calcPrevTotalPotentialEnergy() {
+        double prevTotalPotEnergy = 0.0;
+        if (celestialObjectPairContainer.empty()) {
+            return prevTotalPotEnergy;
+        }
+        for (pairContainer<CelestialObject> pair : celestialObjectPairContainer) {
+            prevTotalPotEnergy += calcPrevPotentialEnergy(pair);
+        }
+        return prevTotalPotEnergy;
     }
 
     //Calculate Relative Energy Increase relative to starting System Energy. Return value is in %
     double calcRelativeEnergyIncrease() {
 		//TODO: Check functionality after implementing energy calculations for Verlet integration
-        double percentage{ std::abs(calcSystemEnergy() / startingSystemEnergy - 1.0f) * 100 };
+        double percentage{ std::abs(calcPrevSystemEnergy() / startingSystemEnergy) * 100 };
         return std::round(percentage * 100.0) / 100.0;
     }
 
+    //Moved to PairContainer Definition
+    /*double calcPrevPairDistance(pairContainer<CelestialObject> pair) {
+        std::vector<double> prevDistance = { pair.a.getPrevPosition()[0] - pair.b.getPrevPosition()[0] , pair.a.getPrevPosition()[1] - pair.b.getPrevPosition()[1] };
+        double distance = std::sqrt(prevDistance[0] * prevDistance[0] + prevDistance[1] * prevDistance[1]);
+        return distance;
+    }*/
+
     //Calculate Current System Energy
-    double calcSystemEnergy() {
-        return calcTotalKineticEnergy() - calcTotalPotentialEnergy();
+    double calcPrevSystemEnergy() {
+        double pot = calcPrevTotalPotentialEnergy();
+        double kin = calcPrevTotalKineticEnergy();
+        double prevSystemEnergy =  pot + kin;
+        return prevSystemEnergy;
     }
 #pragma endregion
 
