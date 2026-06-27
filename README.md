@@ -27,7 +27,9 @@ If you try out the code (and manage to run it) feel free to give me some feedbac
 ---
 
 ## Screenshots
-
+Running Simulation of two celestial Bodies
 <img width="827" alt="Simulation view" src="https://github.com/user-attachments/assets/ea489efa-8ef4-42fc-9552-56b8a27d72fa" />
 
+Simulation Setup mode
 <img width="1910" alt="Editor view" src="https://github.com/user-attachments/assets/2529a5df-d1da-409e-bc1e-2a293e0768c8" />
+
